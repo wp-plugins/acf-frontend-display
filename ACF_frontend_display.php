@@ -23,9 +23,9 @@ require_once( plugin_dir_path( __FILE__ ) . '/inc/afd_acf_extend_api.php' );
 /* ACF EXTENTION - INIT UPLAOAD FILE */
 function afd_upload_field() {
 	
-	require_once( plugin_dir_path( __FILE__ ) . '/fields-pack/field-upload-file.php');
+	//require_once( plugin_dir_path( __FILE__ ) . '/fields-pack/field-upload-file.php');
 }
-add_action('acf/register_fields', 'afd_upload_field');
+//add_action('acf/register_fields', 'afd_upload_field');
 
 
 /* METABOX start ------------------------------------ */
