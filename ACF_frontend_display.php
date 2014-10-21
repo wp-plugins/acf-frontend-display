@@ -320,10 +320,4 @@ function afd_add_form_to_frontend_page($content) {
 	    echo '</div>';
 	}
 }
-add_filter( 'the_content', 'afd_add_form_to_frontend_page', 6); 
-
-
-
-
-
-?>
+add_filter( 'the_content', 'afd_add_form_to_frontend_page', 6);

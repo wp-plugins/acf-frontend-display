@@ -12,7 +12,7 @@ ACF Frontend display - plugin to display ACF form on frontend your site
 
 ACF Frontend display - checking option field to render your post or page on normal (frontend) display mode.
 
-Major features in Akismet include:
+Major features in ACF Frontend display include:
 
 * Automatically display ACF form on page or post.
 
