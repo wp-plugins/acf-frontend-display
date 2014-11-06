@@ -415,10 +415,11 @@ function acf_js_init()
 	/* http://www.advancedcustomfields.com/resources/create-a-front-end-form/   */
 	/* scripts list: 'jquery','jquery-ui-core','jquery-ui-tabs','jquery-ui-sortable','wp-color-picker','thickbox','media-upload','acf-input','acf-datepicker',	*/
 	/* style list: 'thickbox', 'wp-color-picker', 'acf-global', 'acf-input', 'acf-datepicker',	*/
-	
+
 	/* Conditional Logic */
-	$output="<script type='text/javascript' src='http://getblockbox.com/ACF_frontend/wp-content/plugins/advanced-custom-fields/js/input.min.js?ver=4.3.9'></script>";
-	$output.="<link rel='stylesheet' id='acf-input-css'  href='http://getblockbox.com/ACF_frontend/wp-content/plugins/advanced-custom-fields/css/input.css?ver=4.3.9' type='text/css' media='all' />";
+	$path = plugin_dir_path() . 'advanced-custom-fields/';
+	$output="<script type='text/javascript' src='".$path."js/input.min.js?ver=4.3.9'></script>";
+	$output.="<link rel='stylesheet' id='acf-input-css'  href='".$path."css/input.css?ver=4.3.9' type='text/css' media='all' />";
 	echo $output;
 }
 add_action('wp_head','acf_js_init');
