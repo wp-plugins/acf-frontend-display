@@ -417,7 +417,7 @@ function acf_js_init()
 	/* style list: 'thickbox', 'wp-color-picker', 'acf-global', 'acf-input', 'acf-datepicker',	*/
 
 	/* Conditional Logic */
-	$path = plugins_url() . 'advanced-custom-fields/';
+	$path = plugins_url() . '/advanced-custom-fields/';
 	$output="<script type='text/javascript' src='".$path."js/input.min.js?ver=4.3.9'></script>";
 	$output.="<link rel='stylesheet' id='acf-input-css'  href='".$path."css/input.css?ver=4.3.9' type='text/css' media='all' />";
 	echo $output;
