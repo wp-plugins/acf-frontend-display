@@ -5,7 +5,7 @@ Plugin URI: https://github.com/dadmor/ACF_frontend_display
 Description: WordPress plugin to display afd form on frontend your site. This Plugin enhancing the Advanced Custom Fields (ACF) 
 Author: gdurtan
 Author URI: grzegorz.durtan.pl
-Version: 0.0.1
+Version: 1.0.2
 License: GPL2
 */
 
@@ -17,8 +17,21 @@ function afd_alpaca_lib_init() {
 	wp_register_style( 'alpaca-css', plugins_url('/css/alpaca-wpadmin.css', __FILE__) );
 	wp_enqueue_style('alpaca-css');
 
+	/* toggle-switch extra field */
+	wp_register_style( 'toggle-switch-css', plugins_url('/css/toggle-switch.css', __FILE__) );
+	wp_enqueue_style('toggle-switch-css');
+
 }
 add_action('admin_enqueue_scripts', 'afd_alpaca_lib_init');
+
+function afd_fields_lib_init() {
+	/* toggle-switch extra field */
+	wp_register_style( 'toggle-switch-css', plugins_url('/css/toggle-switch.css', __FILE__) );
+	wp_enqueue_style('toggle-switch-css');
+
+}
+add_action('wp_enqueue_scripts', 'afd_fields_lib_init');
+
 
 require_once( plugin_dir_path( __FILE__ ) . '/inc/afd_acf_extend_api.php' );
 
@@ -26,8 +39,9 @@ require_once( plugin_dir_path( __FILE__ ) . '/inc/afd_acf_extend_api.php' );
 function afd_upload_field() {
 	
 	//require_once( plugin_dir_path( __FILE__ ) . '/fields-pack/field-upload-file.php');
+	require_once( plugin_dir_path( __FILE__ ) . '/fields-pack/field-poolAB-file.php');
 }
-//add_action('acf/register_fields', 'afd_upload_field');
+add_action('acf/register_fields', 'afd_upload_field');
 
 
 /* METABOX start ------------------------------------ */
@@ -43,14 +57,12 @@ function afd_frontend_add_meta_box() {
 
 	foreach ( $screens as $screen ) {
 
-
-
 		/* only editors or administrator can display forms */
 		if( current_user_can('edit_others_pages') ) {  
 			if( $screen == 'acf' ){
-				$title_box = __( 'AFD - front form GLOBALS', 'myplugin_textdomain' );
+				$title_box = __( 'AFD - front form GLOBALS', 'acf_frontend_display' );
 			}else{
-				$title_box = __( 'AFD - view form on front of page', 'myplugin_textdomain' );
+				$title_box = __( 'AFD - view form on front of page', 'acf_frontend_display' );
 			}
 			/* display ACF frontend metabox */
 			add_meta_box(
@@ -78,8 +90,6 @@ function afd_frontend_meta_box_callback( $post ) {
 
 	$global_render = get_post_meta( $global_form_id, '_meta_afd_form_render_box_key', true );
 	$global_alpaca = get_post_meta( $global_form_id, '_meta_afd_form_render_box_alpaca', true );
-	
-
 
 	// Add an nonce field so we can check for it later.
 	wp_nonce_field( 'afd_frontend_meta_box', 'afd_frontend_meta_box_nonce' );
@@ -118,13 +128,12 @@ function afd_frontend_meta_box_callback( $post ) {
 
 		echo '<input type="checkbox" id="afd_form_render_box_field" name="afd_form_render_box_field" value="true" size="25" '.$checked.'/>';
 		echo '<label for="afd_form_render_box_field">';
-		_e( 'check it to display your ACF form', 'myplugin_textdomain' );
+		_e( 'check it to display your ACF form', 'acf_frontend_display' );
 		echo '</label> ';
 
 		echo '<input type="hidden" id="afd_alpaca_data" name="afd_alpaca_data" value="'.$value_alpaca.'" size="25" />';
 
-		?>
-		<div id="afd_display_more_options" style=""></div> 
+		?><div id="afd_display_more_options" style=""></div> 
 		<script type="text/javascript">
 			jQuery(document).ready(function($) {
 			    $("#afd_display_more_options").alpaca({
@@ -293,17 +302,13 @@ function afd_frontend_meta_box_callback( $post ) {
 	            /* ----------------------------------------------------------------------- */
 			  });
 			});
-		</script>
-		<?php
+		</script><?php
 
-		}else{
-			echo 'add <a href="'.get_bloginfo('home').'/wp-admin/edit.php?post_type=acf">acf form</a> to this post';
-		}
-
-
-		
-
+	}else{
+		echo 'add <a href="'.get_bloginfo('home').'/wp-admin/edit.php?post_type=acf">acf form</a> to this post';
 	}
+
+}
 
 /**
  * When the post is saved, saves our custom data.
@@ -369,16 +374,10 @@ add_action( 'save_post', 'afd_save_meta_box_data' );
 /* DISPLAY filter ------------------------------------ */
 
 function afd_add_form_to_frontend_page($content) {
-    
-	/* IMPORTANT !!! afd bug fix - disable NOW                       */
-	/* This script dont't work in wp_enqueue_script method           */
-	/* afd plugin call to it before wp_enqueue finished load         */
-	//echo '<script src="'.plugins_url().'/advanced-custom-fields/js/input.js" type="text/javascript" charset="utf-8"></script>';  
-	//echo '<script src="'.plugins_url().'/advanced-custom-fields/js/field-group.min.js" type="text/javascript" charset="utf-8"></script>'; 
-	/* ------------------------------------------------------------- */
-    
-    acf_form_head();
+
+    afd_form_head();
     wp_deregister_style( 'wp-admin' );
+    
     global $post;
 	$args = json_decode( urldecode ( get_post_meta($post->ID,'_meta_afd_form_render_box_alpaca', true )), true );
 	unset($args['dependence_one']);
@@ -393,19 +392,34 @@ function afd_add_form_to_frontend_page($content) {
 	    	if( empty($args) == true){
 			
 				/* afd_frontend_form() is afd_form() extended method */
-				afd_frontend_form();
+				//afd_frontend_form();
+				acf_form(); 
 
 			}else{
 
 				/* afd_frontend_form() is afd_form() extended method */
-				afd_frontend_form($args);
+				//afd_frontend_form($args);
+				acf_form($args); 
 
 			}
 
 	    echo '</div>';
 	}
 
-
 }
 add_filter( 'the_content', 'afd_add_form_to_frontend_page', 6);
+
+function acf_js_init()
+{
+	/* this actior included acf scripts with official documentation:         */
+	/* http://www.advancedcustomfields.com/resources/create-a-front-end-form/   */
+	/* scripts list: 'jquery','jquery-ui-core','jquery-ui-tabs','jquery-ui-sortable','wp-color-picker','thickbox','media-upload','acf-input','acf-datepicker',	*/
+	/* style list: 'thickbox', 'wp-color-picker', 'acf-global', 'acf-input', 'acf-datepicker',	*/
+	
+	/* Conditional Logic */
+	$output="<script type='text/javascript' src='http://getblockbox.com/ACF_frontend/wp-content/plugins/advanced-custom-fields/js/input.min.js?ver=4.3.9'></script>";
+	$output.="<link rel='stylesheet' id='acf-input-css'  href='http://getblockbox.com/ACF_frontend/wp-content/plugins/advanced-custom-fields/css/input.css?ver=4.3.9' type='text/css' media='all' />";
+	echo $output;
+}
+add_action('wp_head','acf_js_init');
 ?>

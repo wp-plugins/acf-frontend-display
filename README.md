@@ -10,9 +10,13 @@
 
 # Comming soon
 
-* Frontend file upload field (no js error fixed #ACF bug)
+* Frontend file upload field 
+* Frontend date picker 
+* Frontend color picker
+* Frontend google maps
 * Repeater meta form with taxonomy dictionary (single and multilevel) Storage data with metas (no serial data)
 * Form proccessor used script based on WordPress API. Included class from http://getblockbox.com/executor_sandbox/wp_executor/
+* extended acces to display on front
 
 -----------------------
 
