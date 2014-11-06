@@ -28,6 +28,11 @@ Upload the ACF Frontend display plugin to your blog, Activate it.
 
 == Changelog ==
 
+= 1.0.2 =
+* Fix JS errors with Conditional Logic
+* Add field poolAB
+* Add global frontend properties
+
 = 1.0.1 =
 * Add {afd} namespaces to variables and methods
 * Add plugin screenshots 
