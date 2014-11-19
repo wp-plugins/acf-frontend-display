@@ -21,7 +21,7 @@ class acf_uigen_uploader extends acf_field
 		// vars
 		$this->name = 'uigen_uploader';
 		$this->label = __("FronEnd Uploader",'uigen_uploader');
-		$this->category = __("FrontEnd",'acf');
+		$this->category = __("Front End",'acf');
 		$this->defaults = array(
 			'default_value'	=>	'',
 			'maxlength'		=>	'',
@@ -43,8 +43,7 @@ class acf_uigen_uploader extends acf_field
 		
 		load_textdomain( 'uigen_uploader', trailingslashit(dirname(__File__)) . 'lang/' . 'uigen_uploader' . '-' . get_locale() . '.mo' );
 	}
-	
-	
+
 	
 	/*
 	*  create_field()
@@ -60,7 +59,7 @@ class acf_uigen_uploader extends acf_field
 	
 	function create_field( $field )
 	{
-		$plugin_url_uploader = 	plugins_url().'/ACF_frontend_display/js/blueimp-jQuery-File-Upload-d45deb1/';
+		$plugin_url_uploader = 	plugins_url().'/acf-frontend-display/js/blueimp-jQuery-File-Upload-d45deb1/';
 				
 		wp_register_script( 'jquery-ui-widget', $plugin_url_uploader.'js/vendor/jquery.ui.widget.js');
 		wp_enqueue_script( 'jquery-ui-widget' );
@@ -70,95 +69,100 @@ class acf_uigen_uploader extends acf_field
 
 		wp_register_script( 'jquery-file-upload',  $plugin_url_uploader.'js/jquery.fileupload.js');
 		wp_enqueue_script( 'jquery-file-upload' );
-	?>
-	<style>
+	?><style>
 		#progress .bar {background-color:#ddd; padding:3px;}
 	</style>
-		<script>
-			jQuery(document).ready(function($) {
-				$('#fileupload').fileupload({
-					dataType: 'json',
-					done: function (e, data) {		
-						$.each(data.result, function (index, file) {
-							$('<p/>').text(file.name).appendTo(document.body);
-						});
-					},
-					progressall: function (e, data) {	
-						var progress = parseInt(data.loaded / data.total * 100, 10);
-						$('#progress .bar').css(
-							'width',
-							progress + '%'
-						);
-						$('#progress .bar').html(progress);
-					},
-					done: function (e, data) {	
-						$('#progress .bar').css(
-							'width','100%'
-						);
-						
-						//alert(data.result[0].name);
-						
-						$('#progress .bar').html('upload finished');
-						
-						<?php
-							// display uploaded image
-							$upload_dir = wp_upload_dir(); 
-							$prew_url =  $upload_dir['baseurl'].'/uigen_'.date("Y").'/thumbnail/';
-							$full_url =  $upload_dir['baseurl'].'/uigen_'.date("Y").'/';
-							
-						?>
-						var js_imp_path = "<?php echo $prew_url?>"+data.result[0].name;
-						
-						$('#dropzone').css('background-image', 'url("'+js_imp_path+'")'); 
-						$('#thumbnail_message').text('<?php _e( "To change photo upload it again", "myplugin_textdomain" );?>');
-						$('#file_list div').text('File '+ data.result[0].name +' is loaded')
-
-						//alert(js_imp_path);
-							
-						$('#acf-field-uploader').val(js_imp_path);
-						
-						//djqsCodeInjector({lang:'<?php echo ICL_LANGUAGE_CODE?>',post_id:$('#save_post').attr('value'),filename:data.result[0].name},'<?php echo plugins_url().'/uigen/modules/postsManager/ci_add_att_img.php'?>',$('#dropzone'),'preppend'); 
-					},
-					dropZone: $('#dropzone')
-				});					
-				
-				jQuery(document).bind('dragover', function (e) {
-					var dropZone = $('#dropzone'),
-						timeout = window.dropZoneTimeout;
-					if (!timeout) {
-						dropZone.addClass('in');
-					} else {
-						clearTimeout(timeout);
-					}
-					if (e.target === dropZone[0]) {
-						dropZone.addClass('hover');
-					} else {
-						dropZone.removeClass('hover');
-					}
-				/*	window.dropZoneTimeout = setTimeout(function () {						
-						window.dropZoneTimeout = null;
-						dropZone.removeClass('in hover');
-					}, 100);*/
-				});
-				
-				jQuery(document).bind('drop dragover', function (e) {
-					e.preventDefault();
-				});
-
-				/* reload image  in back history */
-				var imgExist = jQuery('.thumbnail_url').text();
-				if(imgExist != ''){
-					$('#dropzone').css('background-image', 'url("'+imgExist+'")'); 
-				}
-
-
+	<script>
+		jQuery(document).ready(function($) {
+			$(".perventDef").click(function(event){
+			  event.preventDefault();
 			});
-			</script>
-	<?php
+			
+			$('#fileupload').fileupload({
+				dataType: 'json',
+				done: function (e, data) {		
+					$.each(data.result, function (index, file) {
+						$('<p/>').text(file.name).appendTo(document.body);
+					});
+				},
+				progressall: function (e, data) {	
+					var progress = parseInt(data.loaded / data.total * 100, 10);
+					$('#progress .bar').css(
+						'width',
+						progress + '%'
+					);
+					$('#progress .bar').html(progress);
+				},
+				done: function (e, data) {	
+					$('#progress .bar').css(
+						'width','100%'
+					);
+					
+					//alert(data.result[0].name);
+
+					
+					
+					$('#progress .bar').html('upload finished');
+					
+					<?php
+						// display uploaded image
+						$upload_dir = wp_upload_dir(); 
+						$prew_url =  $upload_dir['baseurl'].'/uigen_'.date("Y").'/thumbnail/';
+						$full_url =  $upload_dir['baseurl'].'/uigen_'.date("Y").'/';
+						
+					?>
+					var js_imp_path = "<?php echo $full_url?>"+data.result[0].name;
+					$(e['target']).parent().next().children('input').val(js_imp_path);
+
+					$('#dropzone').css('background-image', 'url("'+js_imp_path+'")'); 
+					$('#thumbnail_message').text('<?php _e( "To change photo upload it again", "myplugin_textdomain" );?>');
+					$('#file_list div').text('File '+ data.result[0].name +' is loaded')
+
+					//alert(js_imp_path);
+						
+					//$('#acf-field-uploader').val(js_imp_path);
+					
+					//djqsCodeInjector({lang:'<?php echo ICL_LANGUAGE_CODE?>',post_id:$('#save_post').attr('value'),filename:data.result[0].name},'<?php echo plugins_url().'/uigen/modules/postsManager/ci_add_att_img.php'?>',$('#dropzone'),'preppend'); 
+				},
+				dropZone: $('#dropzone')
+			});					
+			
+			jQuery(document).bind('dragover', function (e) {
+				var dropZone = $('#dropzone'),
+					timeout = window.dropZoneTimeout;
+				if (!timeout) {
+					dropZone.addClass('in');
+				} else {
+					clearTimeout(timeout);
+				}
+				if (e.target === dropZone[0]) {
+					dropZone.addClass('hover');
+				} else {
+					dropZone.removeClass('hover');
+				}
+			/*	window.dropZoneTimeout = setTimeout(function () {						
+					window.dropZoneTimeout = null;
+					dropZone.removeClass('in hover');
+				}, 100);*/
+			});
+			
+			jQuery(document).bind('drop dragover', function (e) {
+				e.preventDefault();
+			});
+
+			/* reload image  in back history */
+			var imgExist = jQuery('.thumbnail_url').text();
+			if(imgExist != ''){
+				$('#dropzone').css('background-image', 'url("'+imgExist+'")'); 
+			}
 
 
-
-
+		});
+	</script>
+	<div class="acf-taxonomy-field">
+	<div class="categorychecklist-holder" style="padding:10px">
+	
+		<?php
 
 		if(!empty($field['mask']))
 			$field['data-mask'] .= $field['mask'];
@@ -168,32 +172,6 @@ class acf_uigen_uploader extends acf_field
 		// vars
 		$o = array( 'id', 'class', 'data-mask', 'data-type', 'name', 'value', 'placeholder' );
 		$e = '';
-
-		?>
-			<!-- UPLOADER -->
-			<div>
-						
-			<span class="acf-button grey btn btn-success fileinput-button" id="fileUploadButt" onclick ="javascript:document.getElementById('fileupload').click();">
-	                    <i class="glyphicon glyphicon-plus"></i>
-	                    <span><?php _e("Add files...",'uigen_uploader'); ?></span>
-	                   
-	        </span>
-
-			<input  
-				id="fileupload" 
-				type="file" 
-				style='visibility: hidden; width:5px;' 
-				name="files[]" 
-				data-url="<?php echo $plugin_url_uploader; ?>server/php/?type=<?php echo $fileSubfolder;?>" multiple>
-
-			<div id="file_list"><div class="alert alert-info"><?php _e("file list is empty.",'uigen_uploader'); ?></div></div>
-			
-			<div id="progress"  class="progress col-md-12">
-				<div class="bar" style="width: 0%;"></div>
-			</div> 
-
-		</div>
-		<?
 		
 		
 		// maxlength
@@ -207,7 +185,7 @@ class acf_uigen_uploader extends acf_field
 		if( $field['prepend'] !== "" )
 		{
 			$field['class'] .= ' acf-is-prepended';
-			$e .= '<div class="acf-input-prepend">' . $field['prepend'] . '</div>';
+			$e .= '<div class="acf-input-prepend" >' . $field['prepend'] . '</div>';
 		}
 		
 		
@@ -215,24 +193,95 @@ class acf_uigen_uploader extends acf_field
 		if( $field['append'] !== "" )
 		{
 			$field['class'] .= ' acf-is-appended';
-			$e .= '<div class="acf-input-append">' . $field['append'] . '</div>';
+			$e .= '<div class="acf-input-append" >' . $field['append'] . '</div>';
+		}
+
+
+		if ( is_admin() ) {
+		     $field_type = 'text';
+		} else {
+		     $field_type = 'hidden';
 		}
 		
 		
-		$e .= '<div class="acf-input-wrap">';
-		$e .= '<input type="text"';
+		$e .= '<div class="acf-input-wrap" >';
+		$e .= '<input type="' . $field_type . '"';
 		
 		foreach( $o as $k )
 		{
 			$e .= ' ' . $k . '="' . esc_attr( $field[ $k ] ) . '"';	
+
+			
+			
+			if( $k == 'value'){
+				echo '<div>';
+				_e("You have added file: ",'uigen_uploader');
+			
+				$f_path = esc_attr( $field[ $k ]);
+				$f_file = basename($f_path); 	
+				echo $f_file;		
+				
+				echo '</div>';
+
+				if(@!is_array(getimagesize(esc_attr( $field[ $k ])))){
+				    echo '<img src="'.esc_attr( $field[ $k ] ).'" />';
+				} 
+				else {
+				    //echo 'faldse';
+				}
+				
+			}
 		}
 		
+		if($f_file != ''){
+			$f_button_add = __("Reload files...",'uigen_uploader');	
+
+			
+
+
+		}else{
+			$f_button_add = __("Add files...",'uigen_uploader');
+		}
+
+
 		$e .= ' />';
 		$e .= '</div>';
 		
 		
+
+ ?>
+		<!-- UPLOADER -->
+		<div>
+						
+			<span id="fileUploadButt" onclick ="javascript:document.getElementById('fileupload').click();">
+            	<i class="glyphicon glyphicon-plus"></i>
+            	<span><input class="uploader_add_files perventDef" type="submit" value="<?php echo $f_button_add; ?>" /></span>
+	        </span>
+
+	        <span><input class="perventDef" type="submit" value="<?php echo _e("Remove",'uigen_uploader') ?>" /></span>
+
+			<input  
+				id="fileupload" 
+				type="file" 
+				style='visibility: hidden; width:5px;' 
+				name="files[]" 
+				data-url="<?php echo $plugin_url_uploader; ?>server/php/?type=<?php echo $fileSubfolder;?>" multiple>
+
+			<div id="file_list"><div class="alert alert-info"><?php _e("Uploaded file list is empty.",'uigen_uploader'); ?></div></div>
+			
+			<div id="progress"  class="progress col-md-12">
+				<div class="bar" style="width: 0%;"></div>
+			</div> 
+
+		</div>
+		<?php
 		// return
 		echo $e;
+	?>
+	</div>
+	</div>
+	<?php	
+
 	}
 	
 	/*
