@@ -28,6 +28,9 @@ Upload the ACF Frontend display plugin to your blog, Activate it.
 
 == Changelog ==
 
+= 1.0.4 =
+* Remove fields validation from backent to frontend 
+
 = 1.0.3 =
 * Add frontend file upload field
 * Add afd_attached_forms_array() API method
