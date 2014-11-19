@@ -5,7 +5,7 @@ Plugin URI: https://github.com/dadmor/ACF_frontend_display
 Description: WordPress plugin to display afd form on frontend your site. This Plugin enhancing the Advanced Custom Fields (ACF) 
 Author: gdurtan
 Author URI: grzegorz.durtan.pl
-Version: 1.0.4
+Version: 1.0.5
 License: GPL2
 */
 
@@ -261,7 +261,7 @@ function afd_frontend_meta_box_callback( $post ) {
 							"enum": ['div', 'tr', 'ul', 'ol', 'dl']
 				        },
 
-				        "dependence_two": {
+				        /*"dependence_two": {
 		                    //"title": "More form options?",
 		                    "type": "boolean"
 		                },
@@ -271,7 +271,7 @@ function afd_frontend_meta_box_callback( $post ) {
 							//"title": "Field element",
 							"dependencies": "dependence_two",
 							"enum": ['standard acf', 'bootstrap']
-				        },
+				        },*/
 
 
 		        
@@ -396,8 +396,6 @@ function afd_add_form_to_frontend_page($content) {
 
 				/* afd_frontend_form() is afd_form() extended method */
 				afd_frontend_form($args);
-				
-
 				//acf_form($args); 
 
 			}
@@ -414,6 +412,7 @@ function acf_js_init()
 	/* http://www.advancedcustomfields.com/resources/create-a-front-end-form/   */
 	/* scripts list: 'jquery','jquery-ui-core','jquery-ui-tabs','jquery-ui-sortable','wp-color-picker','thickbox','media-upload','acf-input','acf-datepicker',	*/
 	/* style list: 'thickbox', 'wp-color-picker', 'acf-global', 'acf-input', 'acf-datepicker',	*/
+	
 	global $post;
 	if( get_post_meta( $post->ID, '_meta_afd_form_render_box_key', true) == 'true'){
 		/* Conditional Logic */
@@ -428,11 +427,3 @@ function acf_js_init()
 	}
 }
 add_action('wp_head','acf_js_init');
-
-
-
-
-
-
-
-?>
