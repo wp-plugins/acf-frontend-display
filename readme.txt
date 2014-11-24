@@ -3,7 +3,7 @@ Contributors: gdurtan
 Tags: ACF, Advanced Custom Field, Frontend, display form
 Requires at least: 3.1
 Tested up to: 4.0
-Stable tag: 1.0.52
+Stable tag: 1.0.53
 License: GPLv2 or later
 
 ACF Frontend display - plugin to display ACF form on frontend your site
