@@ -29,7 +29,9 @@ add_action('admin_enqueue_scripts', 'afd_admin_lib_init');
 
 function afd_fields_frontend_lib_init() {
 	if ( !is_admin() ) {
-		/* filelds pack css */
+
+		wp_enqueue_script('jquery');
+
 		wp_register_style( 'fields-pack', plugins_url('/css/frontend-fields-pack.css', __FILE__) );
 		wp_enqueue_style('fields-pack');
 
@@ -152,8 +154,9 @@ function afd_frontend_meta_box_callback( $post ) {
 			    /* ----------------------------------------------------------------------- */	
 			    	<?php if($value_alpaca != ''){ ?>
 			    	"data" : <?php echo urldecode ( $value_alpaca );?>,
-			    	<? } ?>
+			    	<?php } ?>
 			    	"options": {
+
 			    		"fields": {
 		                	"dependence_one": {
 		                    	"rightLabel": "more options"
@@ -387,17 +390,14 @@ function afd_add_form_to_frontend_page($content) {
 	   	echo '<div class="site-main">';
 
 	    	if( empty($args) == true){
-			
 				/* afd_frontend_form() is afd_form() extended method */
 				afd_frontend_form();
 				//acf_form(); 
-
 			}else{
 
 				/* afd_frontend_form() is afd_form() extended method */
 				afd_frontend_form($args);
 				//acf_form($args); 
-
 			}
 
 	    echo '</div>';
