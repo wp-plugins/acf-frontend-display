@@ -146,7 +146,7 @@ class acf_afd_hidden extends acf_field
 		?>
 
 		  
-		<input id="<?php echo $field['id'];?>1" type="<?php echo $field_type; ?>" <? echo $e; ?>>
+		<input id="<?php echo $field['id'];?>1" type="<?php echo $field_type; ?>" <?php echo $e; ?>>
 		 
 
 	

@@ -5,7 +5,7 @@ Plugin URI: https://github.com/dadmor/ACF_frontend_display
 Description: WordPress plugin to display afd form on frontend your site. This Plugin enhancing the Advanced Custom Fields (ACF) 
 Author: gdurtan
 Author URI: grzegorz.durtan.pl
-Version: 1.0.4
+Version: 1.0.53
 License: GPL2
 */
 
@@ -29,7 +29,9 @@ add_action('admin_enqueue_scripts', 'afd_admin_lib_init');
 
 function afd_fields_frontend_lib_init() {
 	if ( !is_admin() ) {
-		/* filelds pack css */
+
+		wp_enqueue_script('jquery');
+
 		wp_register_style( 'fields-pack', plugins_url('/css/frontend-fields-pack.css', __FILE__) );
 		wp_enqueue_style('fields-pack');
 
@@ -152,8 +154,9 @@ function afd_frontend_meta_box_callback( $post ) {
 			    /* ----------------------------------------------------------------------- */	
 			    	<?php if($value_alpaca != ''){ ?>
 			    	"data" : <?php echo urldecode ( $value_alpaca );?>,
-			    	<? } ?>
+			    	<?php } ?>
 			    	"options": {
+
 			    		"fields": {
 		                	"dependence_one": {
 		                    	"rightLabel": "more options"
@@ -261,7 +264,7 @@ function afd_frontend_meta_box_callback( $post ) {
 							"enum": ['div', 'tr', 'ul', 'ol', 'dl']
 				        },
 
-				        "dependence_two": {
+				        /*"dependence_two": {
 		                    //"title": "More form options?",
 		                    "type": "boolean"
 		                },
@@ -271,7 +274,7 @@ function afd_frontend_meta_box_callback( $post ) {
 							//"title": "Field element",
 							"dependencies": "dependence_two",
 							"enum": ['standard acf', 'bootstrap']
-				        },
+				        },*/
 
 
 		        
@@ -387,19 +390,14 @@ function afd_add_form_to_frontend_page($content) {
 	   	echo '<div class="site-main">';
 
 	    	if( empty($args) == true){
-			
 				/* afd_frontend_form() is afd_form() extended method */
 				afd_frontend_form();
 				//acf_form(); 
-
 			}else{
 
 				/* afd_frontend_form() is afd_form() extended method */
 				afd_frontend_form($args);
-				
-
 				//acf_form($args); 
-
 			}
 
 	    echo '</div>';
@@ -414,6 +412,7 @@ function acf_js_init()
 	/* http://www.advancedcustomfields.com/resources/create-a-front-end-form/   */
 	/* scripts list: 'jquery','jquery-ui-core','jquery-ui-tabs','jquery-ui-sortable','wp-color-picker','thickbox','media-upload','acf-input','acf-datepicker',	*/
 	/* style list: 'thickbox', 'wp-color-picker', 'acf-global', 'acf-input', 'acf-datepicker',	*/
+	
 	global $post;
 	if( get_post_meta( $post->ID, '_meta_afd_form_render_box_key', true) == 'true'){
 		/* Conditional Logic */
@@ -428,11 +427,3 @@ function acf_js_init()
 	}
 }
 add_action('wp_head','acf_js_init');
-
-
-
-
-
-
-
-?>
