@@ -1,3 +1,8 @@
-.field_type-afd_hidden{
-  display:none;
+.field_type-afd_hidden, .field_type-afd_hidden label{
+	display:none !important;
+}
+#message.updated{
+	border: #DFDFDF solid 1px;
+	border-radius: 3px;
+	padding:20px 20px 0px 20px;
 }

@@ -102,8 +102,30 @@ class acf_afd_hidden extends acf_field
 			)
 		));
 		?>
+	</td>	
+</tr>
+
+
+<tr class="field_option field_option_<?php echo $this->name; ?>">
+	<td class="label">
+		<label><?php _e("Form Message",'acf'); ?></label>
+		<p><?php _e("Replace ACF message with conditional logic",'acf') ?></p>
+	</td>
+	<td>
+		<?php 
+		do_action('acf/create_field', array(
+			'type'	=>	'textarea',
+			'name'	=>	'fields['.$key.'][updated_message]',
+			'value'	=>	$field['updated_message'],
+			'choices' => array(
+				'updated_message'	=>	__("updated_message",'acf'),
+				
+			)
+		));
+		?>
 	</td>
 </tr>
+
 <?php
 		
 	}

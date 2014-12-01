@@ -142,8 +142,13 @@ function afd_form_head()
 function afd_frontend_form( $options = array() )
 {
     global $post;
-    
-    
+    global $acf;
+   
+    //var_dump('sad',$acf);
+    if(@$acf->AFD_block_display == true){
+        $block_display_guargian = true;
+    }
+
     // defaults
     $defaults = array(
         'post_id' => false,
@@ -195,7 +200,7 @@ function afd_frontend_form( $options = array() )
         );
         
         
-        if( strpos($options['post_id'], 'user_') !== false )
+/*        if( strpos($options['post_id'], 'user_') !== false )
         {
             $user_id = str_replace('user_', '', $options['post_id']);
             $filter = array(
@@ -208,7 +213,7 @@ function afd_frontend_form( $options = array() )
             $filter = array(
                 'ef_taxonomy' => $taxonomy_id
             );
-        }
+        }*/
         
         
         $options['field_groups'] = array();
@@ -219,34 +224,33 @@ function afd_frontend_form( $options = array() )
     // updated message
     if(isset($_GET['updated']) && $_GET['updated'] == 'true' && $options['updated_message'])
     {
-        echo '<div id="message" class="updated"><p>' . $options['updated_message'] . '</p></div>';
+       $display_message = $options['updated_message'];
     }
-    
+   
     
     // display form
-    if( $options['form'] ): ?>
-    <form <?php if($options['form_attributes']){foreach($options['form_attributes'] as $k => $v){echo $k . '="' . $v .'" '; }} ?>>
-    <?php endif; ?>
-    
-    <div style="display:none">
-        <script type="text/javascript">
-            acf.o.post_id = <?php echo is_numeric($options['post_id']) ? $options['post_id'] : '"' . $options['post_id'] . '"'; ?>;
-        </script>
-        <input type="hidden" name="acf_nonce" value="<?php echo wp_create_nonce( 'input' ); ?>" />
-        <input type="hidden" name="post_id" value="<?php echo $options['post_id']; ?>" />
-        <input type="hidden" name="return" value="<?php echo $options['return']; ?>" />
-        <?php wp_editor('', 'acf_settings'); ?>
-    </div>
-    
-    <div id="poststuff">
-    <?php
-    
+
+    $html_f_head = '';
+
+    if( $options['form'] ): 
+    $html_f_head = '<form ';
+        if($options['form_attributes']){
+            foreach($options['form_attributes'] as $k => $v){
+                $html_f_head .= $k . '="' . $v .'" '; 
+        }
+    } 
+    $html_f_head .= '>';
+    endif; 
+
     // html before fields
-    echo $options['html_before_fields'];
+    $html_body_top_decorator = '';
+    $html_body_top_decorator .= '<div id="poststuff">';
     
+    $html_body_top_decorator .= $options['html_before_fields'];
     
     $acfs = apply_filters('acf/get_field_groups', array());
     
+   
     if( is_array($acfs) ){ foreach( $acfs as $acf ){
         
         // only add the chosen field groups
@@ -254,23 +258,21 @@ function afd_frontend_form( $options = array() )
         {
             continue;
         }
-        
-        
+
         // load options
         $acf['options'] = apply_filters('acf/field_group/get_options', array(), $acf['id']);
         
-        
         // load fields
         $fields = apply_filters('acf/field_group/get_fields', array(), $acf['id']);
-        
-        
-        echo '<div id="acf_' . $acf['id'] . '" class="postbox acf_postbox ' . $acf['options']['layout'] . '">';
-        echo '<h3 class="hndle"><span>' . $acf['title'] . '</span></h3>';
-        echo '<div class="inside">';
+
+        $html_body_top_decorator .= '<div id="acf_' . $acf['id'] . '" class="postbox acf_postbox ' . $acf['options']['layout'] . '">';
+        $html_body_top_decorator .= '<h3 class="hndle"><span>' . $acf['title'] . '</span></h3>';
+        $html_body_top_decorator .= '<div class="inside">';
         
         /* realize forced hidden fields  */
         // nie trzeba tego robić - forcehidden działa :)
         //$fields = forced_hidden($fields);
+        
         /* ----------------------------- */
         
         /* ----------------------------- */
@@ -278,36 +280,84 @@ function afd_frontend_form( $options = array() )
         //echo '<pre>';
         //var_dump($fields);
         //echo '</pre>';
+
         if($options['css_type'] == 'bootstrap'){
             foreach ($fields as $key => $value) {
                 $fields[$key]['class'] = 'form-control';
             }
-        }
-        do_action('acf/create_fields', $fields, $options['post_id']);
-        
-        echo '</div></div>';
+        }        
+
+        $html_body_bottom_decorator = '</div></div>';
+       
+            foreach ($fields as $field) {
+
+            if($field['updated_message'] != ''){
+                
+                $dependencyName = $field['conditional_logic']['rules'][0]["field"];
+                $dependencyValue = $field['conditional_logic']['rules'][0]["value"];
+               
+
+                if($_POST['fields'][$dependencyName] == $dependencyValue  ){
+                    //print('dep true');
+                    //$dependency_guardian = true;
+                    $display_message = $field['updated_message'];
+
+                }
+                /* is conditional logic */
+            };
+
+/*            if($dependency_guardian != true){
+                $display_message = $field['updated_message'];
+            }*/
+       
+    }        
         
     }}
     
-    
     // html after fields
-    echo $options['html_after_fields'];
+    $html_body_bottom_decorator .= $options['html_after_fields'];
     
-    ?>
+    if( $options['form'] ): 
+        $html_body_bottom_decorator .= '<!-- Submit -->';
+        $html_body_bottom_decorator .= '<div class="field">';
+        $html_body_bottom_decorator .= '<input type="submit" value="'.$options['submit_value'].'" />';
+        $html_body_bottom_decorator .= '</div>';
+        $html_body_bottom_decorator .= '<!-- / Submit -->';
+    endif;
     
-    <?php if( $options['form'] ): ?>
-    <!-- Submit -->
-    <div class="field">
-        <input type="submit" value="<?php echo $options['submit_value']; ?>" />
-    </div>
-    <!-- / Submit -->
-    <?php endif; ?>
+    $html_body_bottom_decorator .= '</div><!-- <div id="poststuff"> -->';
     
-    </div><!-- <div id="poststuff"> -->
+    if( $options['form'] ):
+        $html_body_bottom_decorator .= '</form>';
+    endif;
+    //var_dump($_POST['acf_nonce']);
+    if($_POST['acf_nonce'] != ''){  
+        if($display_message != ''){
+            echo '<div id="message" class="updated"><p>'.$display_message.'</p></div>';
+        }
+    }
     
-    <?php if( $options['form'] ): ?>
-    </form>
-    <?php endif;
+    if( $block_display_guargian != true ){
+
+        echo $html_f_head;
+        ?>
+        <div style="display:none">
+            <script type="text/javascript">
+                acf.o.post_id = <?php echo is_numeric($options['post_id']) ? $options['post_id'] : '"' . $options['post_id'] . '"'; ?>;
+            </script>
+            <input type="hidden" name="acf_nonce" value="<?php echo wp_create_nonce( 'input' ); ?>" />
+            <input type="hidden" name="post_id" value="<?php echo $options['post_id']; ?>" />
+            <input type="hidden" name="return" value="<?php echo $options['return']; ?>" />
+            <?php wp_editor('', 'acf_settings'); ?>
+        </div>
+        <?php
+        echo  $html_body_top_decorator;
+        /* ACF action problem - dont return data - only forced print it */  
+        do_action('acf/create_fields', $fields, $options['post_id']);
+        echo $html_body_bottom_decorator;
+    
+    }
+
 }
 
 function forced_hidden($fields){
@@ -331,5 +381,7 @@ function forced_hidden($fields){
 
     return $fields;
 }
+
+
 
 ?>

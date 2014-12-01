@@ -5,7 +5,7 @@ Plugin URI: https://github.com/dadmor/ACF_frontend_display
 Description: WordPress plugin to display afd form on frontend your site. This Plugin enhancing the Advanced Custom Fields (ACF) 
 Author: gdurtan
 Author URI: grzegorz.durtan.pl
-Version: 1.0.53
+Version: 1.0.6
 License: GPL2
 */
 
@@ -27,20 +27,27 @@ function afd_admin_lib_init() {
 }
 add_action('admin_enqueue_scripts', 'afd_admin_lib_init');
 
+
+
+
+
 function afd_fields_frontend_lib_init() {
+	
 	if ( !is_admin() ) {
 
 		wp_enqueue_script('jquery');
-
-		wp_register_style( 'fields-pack', plugins_url('/css/frontend-fields-pack.css', __FILE__) );
-		wp_enqueue_style('fields-pack');
-
 		wp_register_script( 'acf-frontend-display', plugins_url('/js/acf-frontend-display.js', __FILE__) );
 		wp_enqueue_script('acf-frontend-display');
 
 		wp_register_style( 'toggle-switch-css', plugins_url('/css/toggle-switch.css', __FILE__) );
 		wp_enqueue_style('toggle-switch-css');
+
+		wp_register_style( 'fields-pack', plugins_url('/css/frontend-fields-pack.css', __FILE__) );
+		wp_enqueue_style('fields-pack');
+	
 	}
+
+	
 }
 add_action('wp_enqueue_scripts', 'afd_fields_frontend_lib_init');
 
@@ -182,7 +189,7 @@ function afd_frontend_meta_box_callback( $post ) {
 		                    "type": "boolean"
 		                },
 
-				        "id": {
+/*				        "id": {
 							"type": "string",
 							"title": "ID",
 							"dependencies": "dependence_one",
@@ -193,7 +200,7 @@ function afd_frontend_meta_box_callback( $post ) {
 							"title": "Post ID",
 							"dependencies": "dependence_one",
 							"description": "The post ID to load data from and save data to. Defaults to the current post. Can also be set to ‘new_post’ to create a new post on submit",
-				        },
+				        },*/
 /*				        "new_post": {
 							"type": "string",
 							"title": "New post",
@@ -211,12 +218,12 @@ function afd_frontend_meta_box_callback( $post ) {
 							"dependencies": "dependence_one",
 							"description": "An array of field Keys or IDs to override the field’s which would normally be displayed for the post"
 				        },*/
-/*				        "form_attributes": {
+				        "form_attributes": {
 							"type": "string",
 							"title": "Form attributes",
 							"dependencies": "dependence_one",
 							"description": "An array or HTML attributes for the form element."
-				        },*/
+				        },
 				        "return": {
 							"type": "string",
 							"title": "Return",
@@ -375,33 +382,37 @@ add_action( 'save_post', 'afd_save_meta_box_data' );
 function afd_add_form_to_frontend_page($content) {
 
 	global $post;
+
+
 	echo '<div>'.$content.'<div>';
 
     /* check display guardian */
     if( get_post_meta( $post->ID, '_meta_afd_form_render_box_key', true) == 'true'){
-	   	afd_form_head();
-	    wp_deregister_style( 'wp-admin' );
-	    
+ 	
+		   	afd_form_head();
+		    wp_deregister_style( 'wp-admin' );
+		    
 
-		$args = json_decode( urldecode ( get_post_meta($post->ID,'_meta_afd_form_render_box_alpaca', true )), true );
-		unset($args['dependence_one']);
+			$args = json_decode( urldecode ( get_post_meta($post->ID,'_meta_afd_form_render_box_alpaca', true )), true );
+			unset($args['dependence_one']);
 
-	   
-	   	echo '<div class="site-main">';
+		   
+		   	echo '<div class="site-main">';
 
-	    	if( empty($args) == true){
-				/* afd_frontend_form() is afd_form() extended method */
-				afd_frontend_form();
-				//acf_form(); 
-			}else{
+		    	if( empty($args) == true){
+					/* afd_frontend_form() is afd_form() extended method */
+					afd_frontend_form();
+					//acf_form(); 
+				}else{
 
-				/* afd_frontend_form() is afd_form() extended method */
-				afd_frontend_form($args);
-				//acf_form($args); 
-			}
+					/* afd_frontend_form() is afd_form() extended method */
+					afd_frontend_form($args);
+					//acf_form($args); 
+				}
 
-	    echo '</div>';
-	}
+		    echo '</div>';
+		}
+
 
 }
 add_filter( 'the_content', 'afd_add_form_to_frontend_page', 6);
