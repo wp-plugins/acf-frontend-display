@@ -3,7 +3,7 @@ Contributors: gdurtan
 Tags: ACF, Advanced Custom Field, Frontend, display form
 Requires at least: 3.1
 Tested up to: 4.0
-Stable tag: 1.0.3
+Stable tag: 1.0.6
 License: GPLv2 or later
 
 ACF Frontend display - plugin to display ACF form on frontend your site
@@ -27,6 +27,16 @@ Upload the ACF Frontend display plugin to your blog, Activate it.
 1, 2, 3: You're done!
 
 == Changelog ==
+
+= 1.0.6 =
+* Hidden field update message
+* Hidden field message check conditional logic
+* Rebuild afd_frontend_display method to implement display templates in future
+* Remove "create_post" option (extended prop) to Form Actions plugin
+* Fix display lalbel with hidden field 
+
+= 1.0.5 =
+* Create this version, because wprepo still download version 1.0.3. I add this ver tag and check
 
 = 1.0.4 =
 * Remove fields validation from backent to frontend 
