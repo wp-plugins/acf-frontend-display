@@ -112,6 +112,7 @@ class acf_afd_hidden extends acf_field
 		<p><?php _e("Replace ACF message with conditional logic",'acf') ?></p>
 	</td>
 	<td>
+
 		<?php 
 		do_action('acf/create_field', array(
 			'type'	=>	'textarea',
@@ -158,17 +159,17 @@ class acf_afd_hidden extends acf_field
 		} else {
 		     $field_type = 'hidden';
 		}
-
 	  
 		$o = array( 'class', 'data-mask', 'data-type', 'name', 'value' , 'placeholder');
 		foreach( $o as $k )
 		{
 			$e .= ' ' . $k . '="' . esc_attr( $field[ $k ] ) . '"';	
 		}
-		?>
-
-		  
-		<input id="<?php echo $field['id'];?>1" type="<?php echo $field_type; ?>" <?php echo $e; ?>>
+		$field['value'] = $field['default_value'];
+		?>	
+		
+		 
+		<input id="<?php echo $field['id'];?>" type="<?php echo $field_type; ?>" name="<?php echo $field['name']?>" value="<?php echo $field['value']; ?>">
 		 
 
 	

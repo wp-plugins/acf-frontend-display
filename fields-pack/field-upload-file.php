@@ -59,7 +59,7 @@ class acf_uigen_uploader extends acf_field
 	
 	function create_field( $field )
 	{
-		$plugin_url_uploader = 	plugins_url().'/acf-frontend-display/js/blueimp-jQuery-File-Upload-d45deb1/';
+		$plugin_url_uploader = 	plugins_url().'/ACF_frontend_display/js/blueimp-jQuery-File-Upload-d45deb1/';
 				
 		wp_register_script( 'jquery-ui-widget', $plugin_url_uploader.'js/vendor/jquery.ui.widget.js');
 		wp_enqueue_script( 'jquery-ui-widget' );
@@ -78,14 +78,16 @@ class acf_uigen_uploader extends acf_field
 			  event.preventDefault();
 			});
 			
-			$('#fileupload').fileupload({
+			$('#fileupload').fileupload({				
 				dataType: 'json',
-				done: function (e, data) {		
+				done: function (e, data) {	
+				alert('done');	
 					$.each(data.result, function (index, file) {
 						$('<p/>').text(file.name).appendTo(document.body);
 					});
 				},
 				progressall: function (e, data) {	
+					alert('progress');	
 					var progress = parseInt(data.loaded / data.total * 100, 10);
 					$('#progress .bar').css(
 						'width',
@@ -94,6 +96,7 @@ class acf_uigen_uploader extends acf_field
 					$('#progress .bar').html(progress);
 				},
 				done: function (e, data) {	
+					alert('done');	
 					$('#progress .bar').css(
 						'width','100%'
 					);
@@ -214,7 +217,7 @@ class acf_uigen_uploader extends acf_field
 			
 			
 			if( $k == 'value'){
-				echo '<div>';
+				echo '<div class="uploader_message alert alert-success">';
 				_e("You have added file: ",'uigen_uploader');
 			
 				$f_path = esc_attr( $field[ $k ]);
@@ -224,7 +227,13 @@ class acf_uigen_uploader extends acf_field
 				echo '</div>';
 
 				if(@!is_array(getimagesize(esc_attr( $field[ $k ])))){
-				    echo '<img src="'.esc_attr( $field[ $k ] ).'" />';
+				    echo '<div class="uploader_img"><img class="img-thumbnail" width="100%" height="auto" src="'.esc_attr( $field[ $k ] ).'" /></div>';
+					?>
+					<button class=".perventDef btn btn-danger delete" data-type="DELETE" data-url="<?php echo esc_attr( $field[ $k ] );?>?delete=true">
+	                    <i class="glyphicon glyphicon-trash"></i>
+	                    <span>Delete</span>
+	                </button>
+	                <?php
 				} 
 				else {
 				    //echo 'faldse';
@@ -251,7 +260,8 @@ class acf_uigen_uploader extends acf_field
 
  ?>
 		<!-- UPLOADER -->
-		<div>
+
+		<div class="uploader_buttons">
 						
 			<span id="fileUploadButt" onclick ="javascript:document.getElementById('fileupload').click();">
             	<i class="glyphicon glyphicon-plus"></i>
@@ -267,7 +277,7 @@ class acf_uigen_uploader extends acf_field
 				name="files[]" 
 				data-url="<?php echo $plugin_url_uploader; ?>server/php/?type=<?php echo $fileSubfolder;?>" multiple>
 
-			<div id="file_list"><div class="alert alert-info"><?php _e("Uploaded file list is empty.",'uigen_uploader'); ?></div></div>
+			<div id="file_list"><div class="uploader_message alert alert-info"><?php _e("Uploaded file list is empty.",'uigen_uploader'); ?></div></div>
 			
 			<div id="progress"  class="progress col-md-12">
 				<div class="bar" style="width: 0%;"></div>
