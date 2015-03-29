@@ -28,7 +28,7 @@ Upload the ACF Frontend display plugin to your blog, Activate it.
 
 == Changelog ==
 
-= 1.1.1 =
+= 1.1.2 =
 * Add acces to roles
 * Fix bootstrap and standard display
 * Fix shordcodes crashed on other pages
