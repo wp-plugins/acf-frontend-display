@@ -112,17 +112,20 @@ function afd_form_head()
 
 
         /* ADF + Forms Actions resoult */
-        $fa = call_user_func('fa_realize_form_actions'); 
+        if (defined('Forms_actions')) {
+        
+            $fa = call_user_func('fa_realize_form_actions'); 
 
 
-        if($fa["block_redirect"] != true){
+            if($fa["block_redirect"] != true){
 
-            if(isset($_POST['return']))
-            {
-                
-                var_dump('redirect disabled - afd_acf_extend_api.php');
-                //wp_redirect($_POST['return']);
-                exit;
+                if(isset($_POST['return']))
+                {
+                    
+                    var_dump('redirect disabled - afd_acf_extend_api.php');
+                    //wp_redirect($_POST['return']);
+                    exit;
+                }
             }
         }
 
