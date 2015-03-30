@@ -12,6 +12,13 @@ ACF Frontend display - plugin to display ACF form on frontend your site
 
 ACF Frontend display - checking option field to render your post or page on normal (frontend) display mode.
 
+Tutorial 1 - display form:
+https://www.youtube.com/watch?v=OZK08xdCQpc
+
+Tutorial 2 - create post
+https://www.youtube.com/watch?v=75syTKWngbY
+[required "Forms actions" plugin]
+
 Major features in ACF Frontend display include:
 
 * Automatically display ACF form on page or post.
