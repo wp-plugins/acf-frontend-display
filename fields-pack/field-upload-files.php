@@ -72,7 +72,8 @@ class acf_uigen_mass_uploader extends acf_field
 		wp_register_script( 'Canvas-to-Blob', '//blueimp.github.io/JavaScript-Canvas-to-Blob/js/canvas-to-blob.min.js');
 		wp_enqueue_script( 'Canvas-to-Blob' );
 
-
+		/* uploader 302 status fix (try dont use it) */
+		//$plugin_url_uploader = 'https://blueimp.github.io/jQuery-File-Upload';
 
 		wp_register_script( 'jquery-iframe-transport',  $plugin_url_uploader.'js/jquery.iframe-transport.js');
 		wp_enqueue_script( 'jquery-iframe-transport' );	
@@ -88,10 +89,6 @@ class acf_uigen_mass_uploader extends acf_field
 
 		wp_register_script( 'jquery-file-upload-validate',  $plugin_url_uploader.'js/jquery.fileupload-validate.js');
 		wp_enqueue_script( 'jquery-file-upload-validate' );
-
-
-
-
 
 	?>
 
