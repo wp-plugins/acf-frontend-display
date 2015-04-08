@@ -5,11 +5,11 @@ Plugin URI: https://github.com/dadmor/ACF_frontend_display
 Description: WordPress plugin to display afd form on frontend your site. This Plugin enhancing the Advanced Custom Fields (ACF)
 Author: gdurtan
 Author URI: grzegorz.durtan.pl
-Version: 1.1.6
+Version: 1.2.0
 License: GPL2
 */
 
-define( 'ACF_forntend_display' , '1.1.6' );
+define( 'ACF_forntend_display' , '1.2.0' );
 
 function afd_admin_lib_init() {
 
@@ -43,15 +43,9 @@ function afd_fields_frontend_lib_init() {
 
 		wp_register_style( 'fields-pack', plugins_url('/css/frontend-fields-pack.css', __FILE__) );
 		wp_enqueue_style('fields-pack');
-
-
-		         
 	}
-
-
 }
 add_action('wp_enqueue_scripts', 'afd_fields_frontend_lib_init');
-
 
 require_once( plugin_dir_path( __FILE__ ) . '/inc/afd_acf_extend_api.php' );
 
@@ -63,8 +57,6 @@ function afd_upload_field() {
 	require_once( plugin_dir_path( __FILE__ ) . '/fields-pack/field-poolAB-file.php');
 	require_once( plugin_dir_path( __FILE__ ) . '/fields-pack/field-hidden-file.php');
 	require_once( plugin_dir_path( __FILE__ ) . '/fields-pack/field-date-picker.php');
-
-	
 }
 add_action('acf/register_fields', 'afd_upload_field');
 
@@ -106,18 +98,42 @@ function afd_frontend_meta_box_callback( $post ) {
 
 	/* create global guardian */
 	if( get_post_type( $post->ID ) == 'acf'){
+
 		$gloabal_guardian = false;
-		echo '<div style="font-weight:bold; border-bottom:1px solid #eee; margin-bottom:10px; padding-bottom:5px">Global properties for '.$post->post_title.'</div>';
+			//$actual_link = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+			$global_prop = get_post_meta( $post->ID, '_meta_afd_form_global_prop', true );
+			
+			if($global_prop == 'true'){
+				$global_prop = 'checked = "checked"';
+			}else{
+				$global_prop = '';
+			}		
+			$rule = get_post_meta($post->ID,'rule',true);
+			if( $rule['param'] == 'page'){
+				$target_post_id = $rule['value'];
+				$target_title = get_the_title($target_post_id);
+				$target_link = get_bloginfo('home').'/wp-admin/post.php?post='.$target_post_id.'&action=edit';
+			}
+			if( $rule['param'] == 'post_type'){
+				//$target_post_id = ;
+				$target_title = $rule['value'];
+				$target_link = get_bloginfo('home').'/wp-admin/edit.php?post_type='.$rule['value'];
+
+			}		
+			?>
+			<div id="updte_directly" class="alpaca_wpbox_msg">
+				<input type="checkbox" id="afd_global_prop" name="afd_global_prop" value="true" size="25" <?php echo $global_prop; ?> />
+				Set as global to <b><a href="<?php echo $target_link; ?>"><?php echo $target_title?></a></b>.
+			</div>
+			<br/>
+		<?php
 	}
 	/* check is globals are defined (in first fieldgroup) */
 	/* TODO use new function from API afd_attached_forms_array */
 	
 	$fieldsArray = afd_form_permision();
 	$global_form_id = $fieldsArray[0];
-
-
-	$global_render = get_post_meta( $global_form_id, '_meta_afd_form_render_box_key', true );
-	$global_alpaca = get_post_meta( $global_form_id, '_meta_afd_form_render_box_alpaca', true );
+	$global_prop = get_post_meta( $global_form_id, '_meta_afd_form_global_prop', true ); // bolean
 
 	// Add an nonce field so we can check for it later.
 	wp_nonce_field( 'afd_frontend_meta_box', 'afd_frontend_meta_box_nonce' );
@@ -126,47 +142,28 @@ function afd_frontend_meta_box_callback( $post ) {
 	 * Use get_post_meta() to retrieve an existing value
 	 * from the database and use the value for the form.
 	 */
-	
-	$create_object = get_post_meta( $post->ID, '_meta_afd_form_create_object', true ); // bolean
+	if( $global_prop == true ){
+
+		echo '<div class="alpaca_wpbox_msg">Set default global properties from ACF form: <a href="'.get_bloginfo('home').'/wp-admin/post.php?post='.$global_form_id.'&action=edit">'.get_the_title($global_form_id).'</a></div></br>';
+	}
 	$value_render = get_post_meta( $post->ID, '_meta_afd_form_render_box_key', true );
 	$value_alpaca = get_post_meta( $post->ID, '_meta_afd_form_render_box_alpaca', true );
-
-	/* overwrite lolal settings for global settings */
-	if($global_render != ''){
-		/* insert global data olny with create new post (no edit) */
-		//if($create_object != 'false'){
-			$value_render = $global_render;
-			$value_alpaca = $global_alpaca;
-		//}
-	}
-
-
-
-	//echo '<input type="checkbox" id="afd_form_render_box_field" name="afd_form_render_box_field" value="' . esc_attr( $value ) . '" size="25" />';
 
 	if(esc_attr( $value_render ) == 'true'){
 		$checked = 'checked=checked';
 	}else{
 		$checked = '';
-	}
-
-	if( (afd_form_permision() == true) || ($post->post_type != 'acf') ){
-		echo '<div class="alpaca_wpbox_msg">Properties for this objest are defined as global with ACF tab on form: <a href="/post.php?post='.$global_form_id.'&action=edit">'.get_the_title($global_form_id).'</a> Your changes ont this panes dont updated.</div></br>';
-	}
+	}	
 	if( (afd_form_permision() == true) || ($post->post_type == 'acf') ){
 
-		
-
-		echo '<input type="hidden" id="afd_create_object" name="afd_create_object" value="'.$create_object.'" size="25" />';
-		
-
+		echo '<div id="afd_render_wraper">';
+			
 			echo '<input type="checkbox" id="afd_form_render_box_field" name="afd_form_render_box_field" value="true" size="25" '.$checked.'/>';
-
-
-
-		echo '<label for="afd_form_render_box_field">';
-		_e( 'display form on page', 'acf_frontend_display' );
-		echo '</label> ';
+			echo '<label for="afd_form_render_box_field">';
+				_e( 'display form on page', 'acf_frontend_display' );
+			echo '</label> ';
+		
+		echo '</div>';
 		
 		echo '<input type="hidden" id="afd_alpaca_data" name="afd_alpaca_data" value="'.$value_alpaca.'" size="25" />';
 
@@ -217,10 +214,6 @@ function afd_frontend_meta_box_callback( $post ) {
 		               		"dependence_three": {
 		                    	"rightLabel": "Display messages"
 		               		},
-
-
-
-
 		               	}
 			    	},
 			    	"schema": {
@@ -228,42 +221,11 @@ function afd_frontend_meta_box_callback( $post ) {
 				      //"description": "Define your special display properties",
 				      "type": "object",
 				      "properties": {
-
 				      	"dependence_one": {
 				      		"disabled" : disabled,
 		                    //"title": "More form options?",
 		                    "type": "boolean"
 		                },
-
-/*				        "id": {
-							"type": "string",
-							"title": "ID",
-							"dependencies": "dependence_one",
-							"description": "A unique identifier for the form. Defaults to ‘afd-form’"
-				        },
-				        "post_id": {
-							"type": "string",
-							"title": "Post ID",
-							"dependencies": "dependence_one",
-							"description": "The post ID to load data from and save data to. Defaults to the current post. Can also be set to ‘new_post’ to create a new post on submit",
-				        },*/
-/*				        "new_post": {
-							"type": "string",
-							"title": "New post",
-							"dependencies": "dependence_one",
-				        },*/
-/*				        "field_groups": {
-							"type": "string",
-							"title": "Field groups",
-							"dependencies": "dependence_one",
-							"description": "An array of field group IDs to override the field’s which would normally be displayed for the post"
-				        },*/
-/*				        "fields": {
-							"type": "string",
-							"title": "Fiels",
-							"dependencies": "dependence_one",
-							"description": "An array of field Keys or IDs to override the field’s which would normally be displayed for the post"
-				        },*/
 				        "form_attributes": {
 				        	"disabled" : disabled,
 							"type": "string",
@@ -271,12 +233,6 @@ function afd_frontend_meta_box_callback( $post ) {
 							"dependencies": "dependence_one",
 							"description": "An array or HTML attributes for the form element."
 				        },
-/*				        "return": {
-							"type": "string",
-							"title": "Return",
-							"dependencies": "dependence_one",
-							"description": "The URL to be redirected to after the post is created / updated. Defaults to the current URL with an extra GET parameter called updated=true. A special placeholder of %post_url% will be converted to post’s permalink (handy if creating a new post)!"
-				        },*/
 				        "html_before_fields": {
 				        	"disabled" : disabled,
 							"type": "string",
@@ -296,19 +252,19 @@ function afd_frontend_meta_box_callback( $post ) {
 							"dependencies": "dependence_one",
 							"description": "A string containing the text displayed on the submit button"
 				        },
+				        "submit_ajax": {
+				        	"disabled" : disabled,
+							"type": "boolean",
+							"title": "Submit with AJAX",
+							"dependencies": "dependence_one",
+							"description": "Asynchronous JavaScript and XML"
+				        },
 				        "updated_message": {
 				        	"disabled" : disabled,
 							"type": "string",
 							"title": "Updated Message",
 							"dependencies": "dependence_one",							
 							"description": "A string message which id displayed above the form after being redirected"
-				        },
-				        "label_placement": {
-				        	"disabled" : disabled,
-							"type": "string",
-							"title": "Label placement",
-							"dependencies": "dependence_one",
-							"enum": ['top', 'left' ,'none']
 				        },
 				        "in_content_pos": {
 				        	"disabled" : disabled,
@@ -317,25 +273,18 @@ function afd_frontend_meta_box_callback( $post ) {
 							"dependencinies": "dependence_one",
 							"enum": ['before', 'after']
 				        },
-				        /*"instruction_placement": {
+				        "label_placement": {
+				        	"disabled" : disabled,
 							"type": "string",
-							"title": "Instruction placement",
+							"title": "Label placement",
 							"dependencies": "dependence_one",
-							"description": "Whether to display instructions below the label or field. Defaults to label"
-				        },*/
-/*				        "field_el": {
-							"type": "string",
-							"title": "Field element",
-							"dependencies": "dependence_one",
-							"enum": ['div', 'tr', 'ul', 'ol', 'dl']
-				        },*/
-
+							"enum": ['top', 'left' ,'none']
+				        },				       
 				        "dependence_two": {
 				        	"disabled" : disabled,
 		                    //"title": "More form options?",
 		                    "type": "boolean"
 		                },
-
 				        "display_template": {
 				        	"disabled" : disabled,
 							"type": "string",
@@ -348,13 +297,11 @@ function afd_frontend_meta_box_callback( $post ) {
 							"description": "Display form only for login users",
 							"type": "boolean"
 				        },
-
 				        "display_edit": {
 				        	"disabled" : disabled,
 							"description": "Edited mode activated by get &edit=form or full parameter",
 							"type": "boolean"
 				        },
-
 				        "dependence_three": {
 				        	"disabled" : disabled,
 		                    //"title": "More form options?",
@@ -411,44 +358,54 @@ function afd_frontend_meta_box_callback( $post ) {
 							"default": "Your activation link was expired.",
 							"dependencies": "dependence_three",							
 				        },
-
-
-
-
+				        "user_not_confirmed": {
+				        	"disabled" : disabled,
+							"type": "string",
+							"title": "User not autenticated",
+							"default": "Not auticated user try edit form.",
+							"dependencies": "dependence_three",	
+				        }
 				      }
 				    },
 			    /* ----------------------------------------------------------------------- */
 				    "postRender": function(renderedForm) {
 						$('#afd_display_more_options select, #afd_display_more_options input, #afd_display_more_options textarea').live('change',function() {
-
-						//if (renderedForm.isValid(true)) {
-						  var val = renderedForm.getValue();
-						  $('#afd_alpaca_data').val(encodeURIComponent(JSON.stringify(val)));
-
+							//if (renderedForm.isValid(true)) {
+							var val = renderedForm.getValue();
+							$('#afd_alpaca_data').val(encodeURIComponent(JSON.stringify(val)));
 						 // $('#<?php echo $my_widget_id."-extra-data"; ?>').val(encodeURIComponent(JSON.stringify(val)));
 						//}
 						});
 
+						// Clone propreties
+						$('.clone_element').on( "click", function () {
+							$("#afd_display_more_options input:checkbox").prop('checked', false);
+							$.post("<?php echo plugins_url('ajax/frontend-display-alpaca-api.php', __FILE__) ?>" , {'ID':$(this).attr('data-id')}, function(response) {
+								console.log(decodeURIComponent(response));
+								renderedForm.setValue(JSON.parse(decodeURIComponent(response)));
+							});
+						});
 		            }
 	            /* ----------------------------------------------------------------------- */
 			  });
 			});
 		</script>
-		
-<!-- 		<div style="border:1px dashed red; margin-top:10px">Save global properties and update in defined target site, post or post_type. TODO: add action to update it from this box.</div>
-<div style="border:1px dashed red; margin-top:10px">
-<p>TODO<a href="">get properties from another form</a> </p>
-	<ul>
-		<?php
-			$anotherForms = apply_filters('acf/get_field_groups', array());
-			foreach ($anotherForms as $key => $value) {
-				
-				echo '<li>'.get_the_title($value['id']).'</li>';
-			}
-		?>
-	</ul>
-</div> -->
 
+		<div id="clone_wrapper">
+			<div styme="margin:5px 0px">
+			<span style="font-size:13px">Clone global properties from:</span><span style="float:right">▼</span>
+			</div>
+			<ul style="margin:0; font-size:11px">
+				<?php
+					$anotherForms = apply_filters('acf/get_field_groups', array());
+					foreach ($anotherForms as $key => $value) {
+						if(get_post_meta($value['id'],'_meta_afd_form_global_prop',true) == true){
+							echo '<li class="clone_element" style="margin:0; color:#2ea2cc; text-decoration:underline; cursor:pointer" data-id="'.$value['id'].'">'.get_the_title($value['id']).'</li>';
+						}
+					}
+				?>
+			</ul>
+		</div>
 
 		<?php
 
@@ -510,16 +467,53 @@ function afd_save_meta_box_data( $post_id ) {
 
 	// Sanitize user input.
 	$my_data_afd_render = sanitize_text_field( $_POST['afd_form_render_box_field'] );
-	$my_data_afd_alpaca = $_POST['afd_alpaca_data'];
-	$my_data_afd_create_object = $_POST['afd_create_object'];
-	if($my_data_afd_create_object == ''){
-		$my_data_afd_create_object = 'false';
-	}
+	$my_data_afd_alpaca = $_POST['afd_alpaca_data'];	
+	$my_data_afd_global_prop = $_POST['afd_global_prop'];
 
 	// Update the meta field in the database.
-	update_post_meta( $post_id, '_meta_afd_form_create_object', $my_data_afd_create_object );
+	update_post_meta( $post_id, '_meta_afd_form_global_prop', $my_data_afd_global_prop );
 	update_post_meta( $post_id, '_meta_afd_form_render_box_key', $my_data_afd_render );
 	update_post_meta( $post_id, '_meta_afd_form_render_box_alpaca', $my_data_afd_alpaca );
+
+	// update globals into target post 
+	if(($_POST['afd_global_prop'] == true)&&($_POST['post_type']=='acf')){
+		$rule = get_post_meta($post_id,'rule',true);
+		if( $rule['param'] == 'page'){
+			$target_post_id = $rule['value'];
+			if($target_post_id != ''){
+				update_post_meta( $target_post_id, '_meta_afd_form_global_prop', $my_data_afd_global_prop );
+				update_post_meta( $target_post_id, '_meta_afd_form_render_box_key', $my_data_afd_render );
+				update_post_meta( $target_post_id, '_meta_afd_form_render_box_alpaca', $my_data_afd_alpaca );
+			}
+		}
+		if( $rule['param'] == 'post_type'){
+			// The Query
+			global $post;
+			$the_query = new WP_Query( array('post_type'=>$rule['value']));
+
+			// The Loop
+			if ( $the_query->have_posts() ) {
+				
+				while ( $the_query->have_posts() ) {
+					$the_query->the_post();
+					update_post_meta( $post->ID, '_meta_afd_form_global_prop', $my_data_afd_global_prop );
+					update_post_meta( $post->ID, '_meta_afd_form_render_box_key', $my_data_afd_render );
+					update_post_meta( $post->ID, '_meta_afd_form_render_box_alpaca', $my_data_afd_alpaca );
+				}
+				
+			} else {
+				// no posts found
+			}
+			/* Restore original Post Data */
+			wp_reset_postdata();
+
+		}		
+
+
+	}
+
+
+
 }
 add_action( 'save_post', 'afd_save_meta_box_data' );
 
@@ -541,7 +535,7 @@ function afd_add_form_to_frontend_page($content) {
     $login_as_author_msg = '<div class="message">'.__('Login as author to edit this post.').'</div>';
 	$hash_expired_msg = '<div class="message">'.__('Your activation link was expired.').'</div>';
 	$hash_ok_msg = '<div class="message">'.__('Registration completed.').'</div>';
-    
+    $user_not_confirmed = '<div class="message">'.__('Your user isnt confirmed by activation link').'</div>';
     // KEY param exist -------------------------------------------------------------
     if($_GET['key'] != ''){
 
@@ -589,10 +583,9 @@ function afd_add_form_to_frontend_page($content) {
 		// Edit by author only
 		if($args['display_edit'] == true) {
 
-			$current_user_id = get_current_user_id();
-			
+			$current_user_id = get_current_user_id();			
 			if($_GET['edit'] == 'form'){
-				if($current_user_id != $post->post_author){
+				if($current_user_id != $post->post_author){					
 					$display_guardian = false;
 					if($args['dependence_three'] == true){
 						$login_as_author_msg = '<div class="message">'.$args['display_messages_author'].'</div>';
@@ -610,12 +603,27 @@ function afd_add_form_to_frontend_page($content) {
 		// Display for login users
 		if($args['display_login'] == true) {
 			if ( !is_user_logged_in() ) {
+				// user is logged out
 				$display_guardian = false;
-
 				if($args['dependence_three'] == true){
 					$must_login_msg = '<div class="message">'.$args['display_messages_login'].'</div>';
 				}
 				echo $must_login_msg;
+			}else{
+					
+				// user is logged in
+				$user = new WP_User( $current_user_id );
+				if(empty($user->roles)){
+					$display_guardian = false;
+					
+					echo $args['dependence_three'];
+
+					if($args['dependence_three'] == true){
+						$user_not_confirmed = '<div class="message">'.$args['user_not_confirmed'].'</div>';
+					}
+					echo $user_not_confirmed;
+				}
+
 			}
 		}
 
