@@ -1,4 +1,15 @@
 <?php
+// AJAX MODE
+if($_POST['ajax_target'] != ''){    
+    require_once("../../../../wp-load.php");
+    $options = $_POST['args'];
+    $options['post_id'] = $_POST['ID'];
+
+    afd_frontend_form($options );
+}
+
+// NORMAL MODE
+
 function afd_form_permision( $options = array() )
 {
     global $post;
@@ -365,13 +376,23 @@ function afd_frontend_form( $options = array() )
         $submit_left = "afd_input_left";
     }
 
-    if( $options['form'] ): 
-        $html_body_bottom_decorator .= '<!-- Submit -->';
+   
+
+    if( $extra_data['submit_ajax'] == true){ 
+        $html_body_bottom_decorator .= '<!-- AJAX Submit -->';
         $html_body_bottom_decorator .= '<div class="field '.$submit_left.'" style="'.$submit_left_style.'">';
-        $html_body_bottom_decorator .= '<input type="submit" value="'.$options['submit_value'].'" class="hvr-float-shadow '.$submit_class.'"/>';
+        $html_body_bottom_decorator .= '<a id="acf_ajax_submit" class="'.$submit_class.'">'.$options['submit_value'].'</a>';
         $html_body_bottom_decorator .= '</div>';
-        $html_body_bottom_decorator .= '<!-- / Submit -->';
-    endif;
+        $html_body_bottom_decorator .= '<!-- / AJAX Submit -->';       
+    }else{
+        if( $options['form'] ): 
+            $html_body_bottom_decorator .= '<!-- Submit -->';
+            $html_body_bottom_decorator .= '<div class="field '.$submit_left.'" style="'.$submit_left_style.'">';
+            $html_body_bottom_decorator .= '<input type="submit" value="'.$options['submit_value'].'" class="hvr-float-shadow '.$submit_class.'"/>';
+            $html_body_bottom_decorator .= '</div>';
+            $html_body_bottom_decorator .= '<!-- / Submit -->';
+        endif;
+    }
     
     $html_body_bottom_decorator .= '</div><!-- <div id="poststuff"> -->';
     
