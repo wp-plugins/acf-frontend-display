@@ -1,4 +1,15 @@
 <?php
+// AJAX MODE
+if($_POST['ajax_target'] != ''){    
+    require_once("../../../../wp-load.php");
+    $options = $_POST['args'];
+    $options['post_id'] = $_POST['ID'];
+
+    afd_frontend_form($options );
+}
+
+// NORMAL MODE
+
 function afd_form_permision( $options = array() )
 {
     global $post;
@@ -372,9 +383,7 @@ function afd_frontend_form( $options = array() )
         $html_body_bottom_decorator .= '<div class="field '.$submit_left.'" style="'.$submit_left_style.'">';
         $html_body_bottom_decorator .= '<a id="acf_ajax_submit" class="'.$submit_class.'">'.$options['submit_value'].'</a>';
         $html_body_bottom_decorator .= '</div>';
-        $html_body_bottom_decorator .= '<!-- / AJAX Submit -->';
-        wp_register_script( 'acf-frontend-ajax', plugins_url('../js/acf-frontend-ajax', __FILE__) );
-        wp_enqueue_script( 'acf-frontend-ajax' );
+        $html_body_bottom_decorator .= '<!-- / AJAX Submit -->';       
     }else{
         if( $options['form'] ): 
             $html_body_bottom_decorator .= '<!-- Submit -->';

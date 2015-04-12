@@ -5,11 +5,11 @@ Plugin URI: https://github.com/dadmor/ACF_frontend_display
 Description: WordPress plugin to display afd form on frontend your site. This Plugin enhancing the Advanced Custom Fields (ACF)
 Author: gdurtan
 Author URI: grzegorz.durtan.pl
-Version: 1.2.0
+Version: 1.3.0
 License: GPL2
 */
 
-define( 'ACF_forntend_display' , '1.2.0' );
+define( 'ACF_forntend_display' , '1.3.0' );
 
 function afd_admin_lib_init() {
 
@@ -43,6 +43,9 @@ function afd_fields_frontend_lib_init() {
 
 		wp_register_style( 'fields-pack', plugins_url('/css/frontend-fields-pack.css', __FILE__) );
 		wp_enqueue_style('fields-pack');
+
+		 wp_register_script( 'acf-frontend-ajax', plugins_url('/js/acf-frontend-ajax', __FILE__) );
+        wp_enqueue_script( 'acf-frontend-ajax' );
 	}
 }
 add_action('wp_enqueue_scripts', 'afd_fields_frontend_lib_init');
@@ -77,9 +80,9 @@ function afd_frontend_add_meta_box() {
 		/* only editors or administrator can display forms */
 		if( current_user_can('edit_others_pages') ) {
 			if( $screen == 'acf' ){
-				$title_box = __( 'Display Form', 'acf_frontend_display' );
+				$title_box = __( 'Display ACF Form', 'acf_frontend_display' );
 			}else{
-				$title_box = __( 'Display Form', 'acf_frontend_display' );
+				$title_box = __( 'Display ACF Form', 'acf_frontend_display' );
 			}
 			/* display ACF frontend metabox */
 			add_meta_box(
@@ -145,6 +148,7 @@ function afd_frontend_meta_box_callback( $post ) {
 	if( $global_prop == true ){
 
 		echo '<div class="alpaca_wpbox_msg">Set default global properties from ACF form: <a href="'.get_bloginfo('home').'/wp-admin/post.php?post='.$global_form_id.'&action=edit">'.get_the_title($global_form_id).'</a></div></br>';
+
 	}
 	$value_render = get_post_meta( $post->ID, '_meta_afd_form_render_box_key', true );
 	$value_alpaca = get_post_meta( $post->ID, '_meta_afd_form_render_box_alpaca', true );
@@ -160,7 +164,7 @@ function afd_frontend_meta_box_callback( $post ) {
 			
 			echo '<input type="checkbox" id="afd_form_render_box_field" name="afd_form_render_box_field" value="true" size="25" '.$checked.'/>';
 			echo '<label for="afd_form_render_box_field">';
-				_e( 'display form on page', 'acf_frontend_display' );
+				_e( '<b>DISPLAY ACF form in CONTENT</b>', 'acf_frontend_display' );
 			echo '</label> ';
 		
 		echo '</div>';
@@ -188,10 +192,13 @@ function afd_frontend_meta_box_callback( $post ) {
 
 			    		"fields": {
 		                	"dependence_one": {
-		                    	"rightLabel": "more options"
+		                    	"rightLabel": "More options"
+		               		},
+		               		"dependence_ajax": {
+		                    	"rightLabel": "AJAX options"
 		               		},
 		               		"dependence_two": {
-		                    	"rightLabel": "Display template"
+		                    	"rightLabel": "Display options"
 		               		},
 		               		"label_placement": {
 		               			"removeDefaultNone": true,
@@ -206,13 +213,17 @@ function afd_frontend_meta_box_callback( $post ) {
 		                    	"rightLabel": "Display for login users",
 
 		               		},
+		               		"submit_ajax": {
+				        		"rightLabel": "Submit with AJAX",
+							
+				        	},	
 		               		"display_edit": {
 		                    	"rightLabel": "Edit by author only",
 
 		               		},
 
 		               		"dependence_three": {
-		                    	"rightLabel": "Display messages"
+		                    	"rightLabel": "Messages"
 		               		},
 		               	}
 			    	},
@@ -225,7 +236,7 @@ function afd_frontend_meta_box_callback( $post ) {
 				      		"disabled" : disabled,
 		                    //"title": "More form options?",
 		                    "type": "boolean"
-		                },
+		                },		                
 				        "form_attributes": {
 				        	"disabled" : disabled,
 							"type": "string",
@@ -252,27 +263,45 @@ function afd_frontend_meta_box_callback( $post ) {
 							"dependencies": "dependence_one",
 							"description": "A string containing the text displayed on the submit button"
 				        },
-				        "submit_ajax": {
-				        	"disabled" : disabled,
-							"type": "boolean",
-							"title": "Submit with AJAX",
-							"dependencies": "dependence_one",
-							"description": "Asynchronous JavaScript and XML"
-				        },
-				        "updated_message": {
+				         "updated_message": {
 				        	"disabled" : disabled,
 							"type": "string",
 							"title": "Updated Message",
 							"dependencies": "dependence_one",							
 							"description": "A string message which id displayed above the form after being redirected"
 				        },
-				        "in_content_pos": {
+				        // --------------------------------------------------------------------
+				        "dependence_ajax": {
+				      		"disabled" : disabled,
+		                    //"title": "More form options?",
+		                    "type": "boolean"
+		                },
+				        "submit_ajax": {
+				        	"disabled" : disabled,
+							"type": "boolean",
+							"title": " ",
+							"dependencies": "dependence_ajax",
+							"description": "Asynchronous JavaScript and XML"
+				        },				        
+				        "ajax_callback": {
 				        	"disabled" : disabled,
 							"type": "string",
-							"title": "Position in content",
-							"dependencinies": "dependence_one",
-							"enum": ['before', 'after']
+							"title": "callback AJAX function name",
+							"dependencies": "dependence_ajax",
+							"description": "Asynchronous JavaScript and XML",
+							"default": "FA_name(callback)",
 				        },
+				        "render_by_id": {
+				        	"disabled" : disabled,
+							"type": "string",
+							"title": "render_by_id",
+							"dependencies": "dependence_ajax",
+							//"description": "Asynchronous JavaScript and XML",
+							//"default": "FA_name(callback)",
+				        },
+
+
+				       
 				        "label_placement": {
 				        	"disabled" : disabled,
 							"type": "string",
@@ -285,13 +314,21 @@ function afd_frontend_meta_box_callback( $post ) {
 		                    //"title": "More form options?",
 		                    "type": "boolean"
 		                },
+		                "in_content_pos": {
+				        	"disabled" : disabled,
+							"type": "string",
+							"title": "Position in content",
+							"dependencies": "dependence_two",
+							"enum": ['disable content','before', 'after']
+				        },
 				        "display_template": {
 				        	"disabled" : disabled,
 							"type": "string",
-							//"title": "Field element",
+							"title": "Form decoration",
 							"dependencies": "dependence_two",
 							"enum": ['standard ACF', 'Bootstrap']
 				        },
+				        
 				        "display_login": {
 				        	"disabled" : disabled,
 							"description": "Display form only for login users",
@@ -299,7 +336,7 @@ function afd_frontend_meta_box_callback( $post ) {
 				        },
 				        "display_edit": {
 				        	"disabled" : disabled,
-							"description": "Edited mode activated by get &edit=form or full parameter",
+							"description": "Edited mode activated by get &edit=form &guid=user_id",
 							"type": "boolean"
 				        },
 				        "dependence_three": {
@@ -406,8 +443,37 @@ function afd_frontend_meta_box_callback( $post ) {
 				?>
 			</ul>
 		</div>
-
 		<?php
+
+		if($post->post_type == 'acf'){
+			?>
+		<script>
+		
+		if(jQuery('#afd_global_prop').attr('checked')==undefined){
+			jQuery('#afd_display_more_options').css('display','none');
+			jQuery('#afd_render_wraper').css('display','none');
+			jQuery('#clone_wrapper').css('display','none');
+		}else{
+
+		}
+
+		jQuery('#afd_global_prop').change(function() {
+
+			if(jQuery('#afd_global_prop').attr('checked')==undefined){
+				jQuery('#afd_display_more_options').css('display','none');
+				jQuery('#afd_render_wraper').css('display','none');
+				jQuery('#clone_wrapper').css('display','none');
+			}else{
+				jQuery('#afd_display_more_options').css('display','block');
+				jQuery('#afd_render_wraper').css('display','block');
+				jQuery('#clone_wrapper').css('display','block');
+			}
+
+		}); 
+			
+		</script>
+		<?php
+		}
 
 	}else{
 		global $acf;
@@ -547,7 +613,7 @@ function afd_add_form_to_frontend_page($content) {
 	    if( $_GET['key'] == get_user_meta( $_GET['user'], '_activation_key', true )){
 
 			delete_user_meta( $_GET['user'], '_activation_key' );
-			wp_update_user( array ('ID' => $_GET['user'], 'role' => 'subscriber' ) ) ;
+			wp_update_user( array ('ID' => $_GET['user'], 'role' => 'author' ) ) ;
 			
 			if($args['dependence_three'] == true){
 				$hash_ok_msg = '<div class="message">'.$args['display_messages_hash_true'].'</div>';
@@ -569,34 +635,40 @@ function afd_add_form_to_frontend_page($content) {
 
 	    }
 
+
+
 	    return $content;
 	}
 	// ----------------------------------------------------------------------------
 
     /* check display guardian */
+
     if( get_post_meta( $post->ID, '_meta_afd_form_render_box_key', true) == 'true'){
 
 		$args = json_decode( urldecode ( get_post_meta($post->ID,'_meta_afd_form_render_box_alpaca', true )), true );
 		$display_guardian = true;
 
+		if($args['render_by_id'] != ''){
+			$display_guardian = false;			
+		}
+
+
 		// EDIT MODE -------------------------------------------------------------
 		// Edit by author only
-		if($args['display_edit'] == true) {
 
-			$current_user_id = get_current_user_id();			
+		if($args['display_edit'] == true) {
 			if($_GET['edit'] == 'form'){
-				if($current_user_id != $post->post_author){					
+				$current_user_id = get_current_user_id();			
+				if($_GET['guid'] != $current_user_id){
 					$display_guardian = false;
 					if($args['dependence_three'] == true){
 						$login_as_author_msg = '<div class="message">'.$args['display_messages_author'].'</div>';
 					}
 					echo $login_as_author_msg;
-				}				
+				}
 			}
+			
 
-			if($_GET['guid'] != $current_user_id){
-				$display_guardian = false;
-			}
 		}
 
 		// LOGIN MODE -------------------------------------------------------------
@@ -612,8 +684,9 @@ function afd_add_form_to_frontend_page($content) {
 			}else{
 					
 				// user is logged in
+				$current_user_id = get_current_user_id();
 				$user = new WP_User( $current_user_id );
-				if(empty($user->roles)){
+				if($user->roles[0]=='subscriber'){
 					$display_guardian = false;
 					
 					echo $args['dependence_three'];
@@ -628,8 +701,10 @@ function afd_add_form_to_frontend_page($content) {
 		}
 
 		/* check form position */
-		if($args['in_content_pos'] == 'after'){
-			echo '<div class="site-main">'.$content.'<div>';
+		if($_GET['edit'] != 'form'){
+			if($args['in_content_pos'] == 'after'){
+				echo '<div class="site-main">'.$content.'<div>';
+			}
 		}
 
 		if($display_guardian == true){
@@ -651,10 +726,30 @@ function afd_add_form_to_frontend_page($content) {
 			echo '</div>';			
 		}
 
-		/* check form position */
-		if($args['in_content_pos'] == 'before'){
-			echo '<div class="site-main">'.$content.'<div>';
+		if($args['render_by_id'] == true){
+			unset($args['dependence_one']);
+			afd_form_head();
+			?>
+			<script>
+				jQuery.post("<?php echo plugins_url('inc/afd_acf_extend_api.php', __FILE__) ?>" , {'ID':108,'ajax_target':'#<?php echo $args["render_by_id"];?>','args':<?php echo urldecode ( get_post_meta($post->ID,'_meta_afd_form_render_box_alpaca', true )); ?>}, function(response) {
+								jQuery('#<?php echo $args["render_by_id"];?>').append(response);
+								//renderedForm.setValue(JSON.parse(decodeURIComponent(response)));
+							});
+			
+			</script>
+			<?php
 		}
+
+		/* check form position */
+		if($_GET['edit'] != 'form'){
+			if($args['in_content_pos'] == 'before'){
+				echo '<div class="site-main">'.$content.'<div>';
+			}
+		}
+
+
+
+
 
 		return false;
 
