@@ -106,7 +106,11 @@
 }
 
 
- #alpaca2-item-container,#alpaca8-item-container,#alpaca13-item-container,#alpaca18-item-container{
+div[data-alpaca-item-container-item-key="dependence_ajax"],
+div[data-alpaca-item-container-item-key="dependence_two"],
+div[data-alpaca-item-container-item-key="dependence_one"],
+div[data-alpaca-item-container-item-key="dependence_three"]
+ {    
 
     background:#ADDAEC url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAKklEQVQIW2N8+eHrf3EBbkYQzQAFjCAaWQDER1EBEgDpQhGEGQMXRDYXAG06Hzohp3oZAAAAAElFTkSuQmCC); 
     
