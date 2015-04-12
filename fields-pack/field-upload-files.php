@@ -57,19 +57,24 @@ class acf_uigen_mass_uploader extends acf_field
 	*  @date	23/01/13
 	*/
 	
-	function create_field( $field )
-	{
-		$plugin_url_uploader = 	plugins_url().'/ACF_frontend_display/js/blueimp-jQuery-File-Upload-d45deb1/';
+	function create_field( $field ){
+
+		
+		$plugin_url_uploader = 	plugins_url( '/js/blueimp-jQuery-File-Upload-d45deb1/', dirname(__FILE__) );
+		//echo $plugin_url_uploader.'<br/>';
+		
 		$upload_dir = wp_upload_dir(); 
+
+		//echo $upload_dir;
 
 
 		wp_register_script( 'jquery-ui-widget', $plugin_url_uploader.'js/vendor/jquery.ui.widget.js');
 		wp_enqueue_script( 'jquery-ui-widget' );
 
-		wp_register_script( 'load-image-all', '//blueimp.github.io/JavaScript-Load-Image/js/load-image.all.min.js');
+		wp_register_script( 'load-image-all', $plugin_url_uploader.'js/load-image.all.min.js');
 		wp_enqueue_script( 'load-image-all' );
 
-		wp_register_script( 'Canvas-to-Blob', '//blueimp.github.io/JavaScript-Canvas-to-Blob/js/canvas-to-blob.min.js');
+		wp_register_script( 'Canvas-to-Blob', $plugin_url_uploader.'js/canvas-to-blob.min.js');
 		wp_enqueue_script( 'Canvas-to-Blob' );
 
 		/* uploader 302 status fix (try dont use it) */
@@ -78,7 +83,7 @@ class acf_uigen_mass_uploader extends acf_field
 		wp_register_script( 'jquery-iframe-transport',  $plugin_url_uploader.'js/jquery.iframe-transport.js');
 		wp_enqueue_script( 'jquery-iframe-transport' );	
 
-		wp_register_script( 'jquery-file-upload',  $plugin_url_uploader.'js/jquery.fileupload.js');
+		wp_register_script( 'jquery-file-upload', $plugin_url_uploader.'js/jquery.fileupload.js');
 		wp_enqueue_script( 'jquery-file-upload' );
 
 		wp_register_script( 'jquery-file-upload-process',  $plugin_url_uploader.'js/jquery.fileupload-process.js');
@@ -88,7 +93,6 @@ class acf_uigen_mass_uploader extends acf_field
 		wp_enqueue_script( 'jquery-file-upload-image' );
 
 		wp_register_script( 'jquery-file-upload-validate',  $plugin_url_uploader.'js/jquery.fileupload-validate.js');
-		wp_enqueue_script( 'jquery-file-upload-validate' );
 
 	?>
 
@@ -199,6 +203,7 @@ class acf_uigen_mass_uploader extends acf_field
 /*global window, $ */
 var filesObj = {};
 var path = "<?php echo $upload_dir['baseurl'].'/uigen_'.date("Y").'/'; ?>";
+console.log('upload patch > '+path);
 jQuery(document).ready(function($) {
 	$(".perventDef").live('click',function(event){
 		event.preventDefault();
@@ -249,6 +254,7 @@ jQuery(document).ready(function($) {
                     $this.remove();
                 });*/
             });
+    console.log('server patch > '+url);
     $('#fileupload').fileupload({
         url: url,
         dataType: 'json',
@@ -265,7 +271,6 @@ jQuery(document).ready(function($) {
         previewCrop: true
     }).on('fileuploadadd', function (e, data) {
 
-    	//alert('start');
     	$('input[type=submit]').prop( "disabled", true );
 
     	$('.progress-bar').css('width','0%');

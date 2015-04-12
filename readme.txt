@@ -3,7 +3,7 @@ Contributors: gdurtan
 Tags: ACF, Advanced Custom Field, Frontend, display form
 Requires at least: 3.1
 Tested up to: 4.0
-Stable tag: 1.1.6
+Stable tag: 1.3.0
 License: GPLv2 or later
 
 ACF Frontend display - plugin to display ACF form on frontend your site
@@ -34,6 +34,13 @@ Upload the ACF Frontend display plugin to your blog, Activate it.
 1, 2, 3: You're done!
 
 == Changelog ==
+= 1.3.0 =
+* Update display options (groups and visual)
+* Add AJAX options
+
+= 1.2.0 =
+* New globals properties politics (don't unlock objects, and overdrive globals dynamicly)
+* Cloning properties from globalized forms.
 
 = 1.1.6 =
 * Add acces to roles
