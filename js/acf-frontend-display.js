@@ -10,3 +10,12 @@ jQuery(document).ready(function( $ ) {
 		}
 	});
 });
+/* googlemap field Minimal version */
+jQuery(document).ready(function( $ ) {
+	$( '.acf-google-map .title' ).live('click',function(){
+		$('.acf-google-map .canvas').slideDown();
+	});
+	$( '.acf-google-map' ).live('mouseleave',function(){
+		$('.acf-google-map .canvas').delay(300).slideUp();
+	});
+});

@@ -1,6 +1,6 @@
 <?php
 
-class acf_afd_hidden extends acf_field
+class acf_afd_multi_relation extends acf_field
 {
 
 		// vars
@@ -20,8 +20,8 @@ class acf_afd_hidden extends acf_field
 	function __construct()
 	{
 		// vars
-		$this->name = 'afd_hidden';
-		$this->label = __('Hidden');
+		$this->name = 'afd_multi_relation';
+		$this->label = __('Multi relation');
 		$this->category = __("Front End",'acf'); // Basic, Content, Choice, etc
 		$this->defaults = array(
 			// add default here to merge into your field. 
@@ -60,74 +60,7 @@ class acf_afd_hidden extends acf_field
 	function create_options( $field )
 	{
 // vars
-		$key = $field['name'];
 
-		if ( is_admin() ) {
-		     $field_type = 'text';
-		} else {
-		     $field_type = 'hidden';
-		}
-		
-		?>
-	<tr class="field_option field_option_<?php echo $this->name; ?>">
-	<td class="label">
-		<label><?php _e("Default Value",'acf'); ?></label>
-		<p><?php _e("Appears when creating a new post. <br/> Extra data: {current_user_id}, {current_post_id}",'acf') ?></p>
-	</td>
-	<td>
-		<?php 
-		do_action('acf/create_field', array(
-			'type'	=>	'text',
-			'name'	=>	'fields[' .$key.'][default_value]',
-			'value'	=>	$field['default_value'],
-		));
-		?>
-	</td>
-</tr>
-
-<tr class="field_option field_option_<?php echo $this->name; ?>">
-	<td class="label">
-		<label><?php _e("Forced hidden",'acf'); ?></label>
-		<p><?php _e("Field dont display and access on page, but storage data and send it to ACTIONS",'acf') ?></p>
-	</td>
-	<td>
-		<?php 
-		do_action('acf/create_field', array(
-			'type'	=>	'checkbox',
-			'name'	=>	'fields['.$key.'][forced_hidden]',
-			'value'	=>	$field['forced_hidden'],
-			'choices' => array(
-				'forced_hidden'	=>	__("Forced hidden",'acf'),
-				
-			)
-		));
-		?>
-	</td>	
-</tr>
-
-
-<tr class="field_option field_option_<?php echo $this->name; ?>">
-	<td class="label">
-		<label><?php _e("Form Message",'acf'); ?></label>
-		<p><?php _e("Replace ACF message with conditional logic",'acf') ?></p>
-	</td>
-	<td>
-
-		<?php 
-		do_action('acf/create_field', array(
-			'type'	=>	'textarea',
-			'name'	=>	'fields['.$key.'][updated_message]',
-			'value'	=>	$field['updated_message'],
-			'choices' => array(
-				'updated_message'	=>	__("updated_message",'acf'),
-				
-			)
-		));
-		?>
-	</td>
-</tr>
-
-<?php
 		
 	}
 	
@@ -153,7 +86,7 @@ class acf_afd_hidden extends acf_field
 		
 		// perhaps use $field['pool_ab'] to alter the markup?
 
-
+		 $field_type = 'hidden';
 		if ( is_admin() ) {
 		     $field_type = 'text';
 		} else {
@@ -165,13 +98,33 @@ class acf_afd_hidden extends acf_field
 		{
 			$e .= ' ' . $k . '="' . esc_attr( $field[ $k ] ) . '"';	
 		}
-		$field['value'] = $field['default_value'];
-		?>	
-		
-		 
-		<input id="<?php echo $field['id'];?>" type="<?php echo $field_type; ?>" name="<?php echo $field['name']?>" value="<?php echo $field['value']; ?>">
-		 
 
+		$repeter_tech_meta_key = 'ref_'.$field['_name'];
+		global $post;
+		//echo $post->ID;
+		
+		if ( is_admin() ) {
+		    echo 'Relations meta name:'.$repeter_tech_meta_key;
+		} 
+		
+		?>
+		<div style="background-color:#ccc;">
+		<?php
+
+
+
+		foreach (get_post_meta($post->ID, $repeter_tech_meta_key, false) as $key => $value) {
+			?>
+				<div style="border:1px solid #666; margin:3px 1px; padding:1px 3px; float:left; font-size:11px"><?php echo $value ?> </div>
+			<?php
+		}		
+		?>	
+		</div>
+		 
+		<!-- <input id="<?php echo $field['id'];?>" type="<?php echo $field_type; ?>" name="<?php echo $field['name']?>" value="<?php echo $field['value']; ?>">
+		  --> 
+		<input id="<?php echo $field['id'];?>" type="<?php echo $field_type; ?>" name="<?php echo $field['name']?>" value="<?php echo $field['value']; ?>">
+		
 	
 
 
@@ -315,6 +268,7 @@ class acf_afd_hidden extends acf_field
 	function update_value( $value, $post_id, $field )
 	{
 		// Note: This function can be removed if not used
+		$value = flaten_relation_builder($value, $post_id, $field['name']);
 		return $value;
 	}
 	
@@ -420,6 +374,9 @@ class acf_afd_hidden extends acf_field
 	function update_field( $field, $post_id )
 	{
 		// Note: This function can be removed if not used
+
+		add_post_meta($post_id, 'dodani_do_spotkania' , 'sraj', true);
+
 		return $field;
 	}
 	
@@ -427,6 +384,6 @@ class acf_afd_hidden extends acf_field
 	
 
 
-new acf_afd_hidden();
+new acf_afd_multi_relation();
 
 ?>

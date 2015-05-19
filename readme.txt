@@ -3,7 +3,7 @@ Contributors: gdurtan
 Tags: ACF, Advanced Custom Field, Frontend, display form
 Requires at least: 3.1
 Tested up to: 4.0
-Stable tag: 1.3.2
+Stable tag: 1.3.3
 License: GPLv2 or later
 
 ACF Frontend display - plugin to display ACF form on frontend your site
@@ -34,6 +34,11 @@ Upload the ACF Frontend display plugin to your blog, Activate it.
 1, 2, 3: You're done!
 
 == Changelog ==
+= 1.3.3 =
+* Rebuild AJAX options - display form by id, init form from js, defined caalback, integrate output with rest-api shemas, check googlemap script
+* Add multi relations field
+* Add date-and-time picker
+
 = 1.3.2 =
 * Update display options (groups and visual)
 * Add AJAX options

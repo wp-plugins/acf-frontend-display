@@ -404,7 +404,7 @@ class UploadHandler
             $file_name .= '.'.$matches[1];
         }
         while(is_dir($this->get_upload_path($file_name))) {
-            $file_name = $this->upcount_name($file_name);
+            $file_name = preg_replace('/\s+/', '', $this->upcount_name($file_name));
         }
         $uploaded_bytes = $this->fix_integer_overflow(intval($content_range[1]));
         while(is_file($this->get_upload_path($file_name))) {
@@ -412,7 +412,7 @@ class UploadHandler
                     $this->get_upload_path($file_name))) {
                 break;
             }
-            $file_name = $this->upcount_name($file_name);
+            $file_name = preg_replace('/\s+/', '', $this->upcount_name($file_name));
         }
         return $file_name;
     }

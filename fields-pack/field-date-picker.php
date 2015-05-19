@@ -21,7 +21,7 @@ class acf_afd_datepicker extends acf_field
 	{
 		// vars
 		$this->name = 'afd_datepicker';
-		$this->label = __('datepicker');
+		$this->label = __('datetimepicker bootstrap only');
 		$this->category = __("Front End",'acf'); // Basic, Content, Choice, etc
 		$this->defaults = array(
 			// add default here to merge into your field. 
@@ -153,25 +153,44 @@ class acf_afd_datepicker extends acf_field
 		
 		// perhaps use $field['pool_ab'] to alter the markup?
 
+		$plugin_url_uploader = 	plugins_url( '/', dirname(__FILE__) );
+		?>	
+		<script type="text/javascript" src="<?php echo $plugin_url_uploader; ?>js/datetime-picker.js"></script>
+		<link rel="stylesheet" href="<?php echo $plugin_url_uploader; ?>css/datetime-picker.css" /> 
+		
+		<?php
+		$o = array( 'id', 'class', 'name', 'value', 'placeholder' );
+		$e = '';
+		$e .= '<div class="acf-input-wrap">';
+		$e .= '<input type="text"';
+	
+		$class = $field['class'];
+		$field['class'] = $class.' datetime-picker';
 
-
-		$o = array( 'class', 'data-mask', 'data-type', 'name', 'value' , 'placeholder');
 		foreach( $o as $k )
 		{
 			$e .= ' ' . $k . '="' . esc_attr( $field[ $k ] ) . '"';	
 		}
-		$field['value'] = $field['default_value'];
-		?>	
-		<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 		
-		<div>
-		<input id="datepicker" type="input" name="<?php echo $field['name']?>" value="<?php echo $field['value']; ?>">
+		$e .= ' />';
+		$e .= '</div>';
+		
+
+		
+		
+		
+		
+		// return
+		echo $e;
+?>
 		</div>
-		 <script>
-		 jQuery(function() {
-		    jQuery( "#datepicker" ).datepicker();
-		  });
-		  </script>
+		<script type="text/javascript">
+            jQuery(function () {
+                jQuery('.datetime-picker').datetimepicker(
+					{format:'Y-m-d H:i:s'}
+                	);
+            });
+        </script>
 	
 
 

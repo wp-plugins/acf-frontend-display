@@ -1,11 +1,8 @@
 <?php
 // AJAX MODE
-if($_POST['ajax_target'] != ''){    
+if($_POST['ajax'] == true){    
     require_once("../../../../wp-load.php");
-    $options = $_POST['args'];
-    $options['post_id'] = $_POST['ID'];
-
-    afd_frontend_form($options );
+    afd_frontend_form( $_POST );
 }
 
 // NORMAL MODE
@@ -112,12 +109,16 @@ function afd_form_head()
 
         // $post_id to save against
         $post_id = $_POST['post_id'];
+
+
         
         
         // allow for custom save
         $post_id = apply_filters('acf/pre_save_post', $post_id);
         
         
+
+
         // save the data
         do_action('acf/save_post', $post_id);   
 
@@ -163,11 +164,11 @@ function afd_form_head()
 
 function afd_frontend_form( $options = array() )
 {
+    
     global $post;
     global $acf;
 
 
-    //var_dump('sad',$acf);
     if(@$acf->AFD_block_display == true){
         $block_display_guargian = true;
     }
@@ -189,11 +190,29 @@ function afd_frontend_form( $options = array() )
         'submit_value' => __("Update", 'acf'),
         'updated_message' => __("Post updated", 'acf'), 
     );
-    
-    
-    // merge defaults with options
+
+    /* merge defaults with options */
     $options = array_merge($defaults, $options);
-    
+
+    /* Exclude forced options form options array */
+    /* now realized only AJAX forms */
+    $forced = $options['forced'];
+
+    /* build GET properties */
+    $get_updated = $_GET['updated'];
+    $get_guid = $_GET['guid'];
+
+
+    /* check and parse get properties on _POST (AJAX) */
+    if( $options['GET']['guid'] != ''){
+        $get_guid = $options['GET']['guid'];
+        if($get_guid == '{current_user_id}'){
+            $get_guid = get_current_user_id();
+        }
+    };
+
+
+    /* Parse GET arguments */  
     
     // merge sub arrays
     foreach( $options as $k => $v )
@@ -203,8 +222,8 @@ function afd_frontend_form( $options = array() )
             $options[ $k ] = array_merge($defaults[ $k ], $options[ $k ]);
         }
     }
-    
-    
+  
+ 
     // filter post_id
     $options['post_id'] = apply_filters('acf/get_post_id', $options['post_id'] );
     
@@ -213,7 +232,6 @@ function afd_frontend_form( $options = array() )
     $options['form_attributes']['class'] .= 'acf-form';
     
     $extra_data = json_decode( urldecode ( get_post_meta($options['post_id'],'_meta_afd_form_render_box_alpaca', true )), true );
-   
     
     // register post box
     if( empty($options['field_groups']) )
@@ -246,14 +264,14 @@ function afd_frontend_form( $options = array() )
 
 
     // updated message
-    if(isset($_GET['updated']) && $_GET['updated'] == 'true' && $options['updated_message'])
+    if(isset($get_updated) && $get_updated == 'true' && $options['updated_message'])
     {
        $display_message = $options['updated_message'];
     }
    
     
     // display form
-
+    $options['form_attributes']['id']='form-container-'.$options["post_id"]; 
     $html_f_head = '';
 
     if( $options['form'] ): 
@@ -268,7 +286,8 @@ function afd_frontend_form( $options = array() )
 
     // html before fields
     $html_body_top_decorator = '';
-    $html_body_top_decorator .= '<div id="poststuff">';
+    //$html_body_top_decorator .= '<div id="poststuff">';
+    $html_body_top_decorator .= '<div>';
     
     $html_body_top_decorator .= $options['html_before_fields'];
     
@@ -309,7 +328,13 @@ function afd_frontend_form( $options = array() )
         /* realize forced hidden fields  */
         // nie trzeba tego robić - forcehidden działa :)
         //$fields = forced_hidden($fields);
-        
+
+
+        /* parse extra datas */
+
+
+
+
         /* ----------------------------- */
         
         /* ----------------------------- */
@@ -358,15 +383,16 @@ function afd_frontend_form( $options = array() )
     }        
         
     }}
+    
 
 
     // html after fields
     $html_body_bottom_decorator .= $options['html_after_fields'];
-    
     $submit_class = "";
     if( $extra_data['display_template'] == 'Bootstrap'){ 
-        $submit_class = "btn btn-lg btn-success";
+        $submit_class = "btn btn-success";
     }
+    $submit_class .= " ".$extra_data['submit_class'];
     
     $submit_left = "";
    
@@ -379,9 +405,11 @@ function afd_frontend_form( $options = array() )
    
 
     if( $extra_data['submit_ajax'] == true){ 
+        $html_body_bottom_decorator .= '<script>required_check("'.$options['form_attributes']['id'].'");</script>';
+
         $html_body_bottom_decorator .= '<!-- AJAX Submit -->';
         $html_body_bottom_decorator .= '<div class="field '.$submit_left.'" style="'.$submit_left_style.'">';
-        $html_body_bottom_decorator .= '<a id="acf_ajax_submit" class="'.$submit_class.'">'.$options['submit_value'].'</a>';
+        $html_body_bottom_decorator .= '<a id="acf_ajax_submit" container-id="'.$options['post_id'].'" data-callback="'.$extra_data["ajax_callback"].'" class="'.$submit_class.'">'.$options['submit_value'].'</a>';
         $html_body_bottom_decorator .= '</div>';
         $html_body_bottom_decorator .= '<!-- / AJAX Submit -->';       
     }else{
@@ -411,6 +439,7 @@ function afd_frontend_form( $options = array() )
         ?>
         <div style="display:none">
             <script type="text/javascript">
+                //console.log('adf_acf_extended_api.php: init acf.o.post_id ----------');
                 acf.o.post_id = <?php echo is_numeric($options['post_id']) ? $options['post_id'] : '"' . $options['post_id'] . '"'; ?>;
             </script>
             <input type="hidden" name="acf_nonce" value="<?php echo wp_create_nonce( 'input' ); ?>" />
@@ -419,14 +448,14 @@ function afd_frontend_form( $options = array() )
             <?php wp_editor('', 'acf_settings'); ?>
         </div>
         <?php
-        echo  $html_body_top_decorator;
+       
         /* ACF action problem - dont return data - only forced print it */  
 
         // Add user profile data
-        if($_GET['guid'] != ''){
+        if($get_guid != ''){
             $current_user_id = get_current_user_id();
-            $user_info = get_userdata($_GET['guid']);
-            if($current_user_id == $_GET['guid']){
+            $user_info = get_userdata($get_guid);
+            if($current_user_id == $get_guid){
                 foreach ($fields as $key => $value) {
                     if($value['name'] == 'first_name'){
                         $fields[$key]['value'] = $user_info->first_name;
@@ -437,23 +466,49 @@ function afd_frontend_form( $options = array() )
                 }
             }else{
                 echo 'User acces lock. Login as right user !!!'; 
+                $block_display_guargian = true;
+
             }
         }
 
+        /* AJAX add forced values */
+        if($forced != NULL){
+           $counter = 0; 
+           foreach ($fields as $key => $value) {
+               foreach ($forced as $key1 => $value1) {
+                  if($key1 == $value['name']){
 
-        afd_create_fields($fields, $options['post_id']);
-       
+                    if($value1 == '{current_user_id}'){
+                        $value1 = get_current_user_id();
+                    }
+
+
+                    $fields[$counter]['value'] = $value1;
+                    $fields[$counter]['default_value'] = $value1;
+                  }
+               }
+               $counter++;
+           }
+        }
+
+
+
+        if($block_display_guargian != true){
+            
+            echo  $html_body_top_decorator;
+            afd_create_fields($fields, $options['post_id']);
+            echo $html_body_bottom_decorator;
+        }
        
 
         //do_action('acf/create_fields', $fields, $options['post_id']);
-        echo $html_body_bottom_decorator;
+       
     
     }
 
 }
 
 function forced_hidden($fields){
-
 
     $counter = 0;
     foreach ($fields as $field) {
@@ -469,6 +524,19 @@ function forced_hidden($fields){
     }
 
     return $fields;
+}
+
+function afd_parse_value($value){
+
+    if($value == '{user_id}'){
+       return get_current_user_id();
+    }
+    if($value == '{post_id}'){
+        global $post;
+        return $post->ID;
+    }
+    return $value;
+    
 }
 
 function afd_create_fields( $fields, $post_id )
@@ -526,10 +594,8 @@ function afd_create_fields( $fields, $post_id )
                 //echo '</pre>';
 
             if( $extra_data['label_placement'] == 'left'){ 
-
             
                 echo '<div id="acf-' . $field['name'] . '" class="'.$main_css_decorator.' field_type-' . $field['type'] . ' field_key-' . $field['key'] . $required_class . '" data-field_name="' . $field['name'] . '" data-field_key="' . $field['key'] . '" data-field_type="' . $field['type'] . '">';
-
 
                     echo '<p class="label afd_label_left">';
                         echo '<label for="' . $field['id'] . '">' . $field['label'] . $required_label . '</label>';
@@ -558,13 +624,7 @@ function afd_create_fields( $fields, $post_id )
 
             }else{
 
-
-
                 echo '<div id="acf-' . $field['name'] . '" class="field '.$main_css_decorator.' field_type-' . $field['type'] . ' field_key-' . $field['key'] . $required_class . '" data-field_name="' . $field['name'] . '" data-field_key="' . $field['key'] . '" data-field_type="' . $field['type'] . '">';
-
-
-
-
 
                     if( $extra_data['label_placement'] != 'none'){ 
                         echo '<p class="label">';
@@ -572,8 +632,6 @@ function afd_create_fields( $fields, $post_id )
                             echo $field['instructions'];
                         echo '</p>';
                     }
-
-
                     
                     $field['name'] = 'fields[' . $field['key'] . ']';
                    
@@ -586,5 +644,28 @@ function afd_create_fields( $fields, $post_id )
         }}
                 
     }
+
+
+function flaten_relation_builder($value, $post_id, $field_name){
+        
+        $repeter_tech_meta_key = 'ref_'.$field_name;
+        $value = preg_replace('/\s+/', '', $value);
+        $metas_array = explode(",", $value);
+        $metas_array = array_unique($metas_array);
+
+        /* delete all */
+        //delete_post_meta_by_key( $repeter_tech_meta_key );
+
+        delete_post_meta($post_id, $repeter_tech_meta_key);
+        
+        foreach ($metas_array as $key => $fvalue) {
+            //$value.= $post_id.':'.$repeter_tech_meta_key.':'.$fvalue.' | ';
+            add_post_meta($post_id, $repeter_tech_meta_key , $fvalue, false);
+        }
+        
+        $value = implode(",", $metas_array);
+        return $value;
+
+}
 
 ?>

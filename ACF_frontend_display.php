@@ -5,13 +5,21 @@ Plugin URI: https://github.com/dadmor/ACF_frontend_display
 Description: WordPress plugin to display afd form on frontend your site. This Plugin enhancing the Advanced Custom Fields (ACF)
 Author: gdurtan
 Author URI: grzegorz.durtan.pl
-Version: 1.3.2
+Version: 1.3.3
 License: GPL2
 */
 
-define( 'ACF_forntend_display' , '1.3.2' );
+
+define( 'ACF_forntend_display' , '1.3.3' );
 
 function afd_admin_lib_init() {
+
+	?>
+
+	<script>
+		window.pluginURI = '<?php echo get_bloginfo("home"); ?>/wp-content/plugins/acf-frontend-display/';
+	</script>
+	<?php
 
 	wp_register_script( 'alpaca-js', plugins_url('/js/alpaca-core.min.js', __FILE__) );
 	wp_enqueue_script( 'alpaca-js' );
@@ -26,6 +34,11 @@ function afd_admin_lib_init() {
 	wp_register_script( 'acf-frontend-display-admin', plugins_url('/js/acf-frontend-display-admin.js', __FILE__) );
 	wp_enqueue_script('acf-frontend-display-admin');
 
+	if($_GET['page']=='acf-export'){
+		wp_register_script( 'acf-more-export', plugins_url('/js/acf-more-export.js', __FILE__) );
+	    wp_enqueue_script( 'acf-more-export' );
+	}
+
 }
 add_action('admin_enqueue_scripts', 'afd_admin_lib_init');
 
@@ -33,6 +46,12 @@ add_action('admin_enqueue_scripts', 'afd_admin_lib_init');
 function afd_fields_frontend_lib_init() {
 
 	if ( !is_admin() ) {
+
+		?>
+		<script>
+			window.pluginURI = '<?php echo get_bloginfo("home"); ?>/wp-content/plugins/acf-frontend-display/';
+		</script>
+		<?php
 
 		wp_enqueue_script('jquery');
 		wp_register_script( 'acf-frontend-display', plugins_url('/js/acf-frontend-display.js', __FILE__) );
@@ -44,8 +63,10 @@ function afd_fields_frontend_lib_init() {
 		wp_register_style( 'fields-pack', plugins_url('/css/frontend-fields-pack.css', __FILE__) );
 		wp_enqueue_style('fields-pack');
 
-		 wp_register_script( 'acf-frontend-ajax', plugins_url('/js/acf-frontend-ajax', __FILE__) );
+		wp_register_script( 'acf-frontend-ajax', plugins_url('/js/acf-frontend-ajax.js', __FILE__) );
         wp_enqueue_script( 'acf-frontend-ajax' );
+
+
 	}
 }
 add_action('wp_enqueue_scripts', 'afd_fields_frontend_lib_init');
@@ -60,6 +81,7 @@ function afd_upload_field() {
 	require_once( plugin_dir_path( __FILE__ ) . '/fields-pack/field-poolAB-file.php');
 	require_once( plugin_dir_path( __FILE__ ) . '/fields-pack/field-hidden-file.php');
 	require_once( plugin_dir_path( __FILE__ ) . '/fields-pack/field-date-picker.php');
+	require_once( plugin_dir_path( __FILE__ ) . '/fields-pack/field-flat-repeater.php');
 }
 add_action('acf/register_fields', 'afd_upload_field');
 
@@ -263,6 +285,13 @@ function afd_frontend_meta_box_callback( $post ) {
 							"dependencies": "dependence_one",
 							"description": "A string containing the text displayed on the submit button"
 				        },
+				        "submit_class": {
+				        	"disabled" : disabled,
+							"type": "string",
+							"title": "Submit class",
+							"dependencies": "dependence_one",
+							"description": "Add extra class into submit button"
+				        },
 				         "updated_message": {
 				        	"disabled" : disabled,
 							"type": "string",
@@ -288,32 +317,32 @@ function afd_frontend_meta_box_callback( $post ) {
 							"type": "string",
 							"title": "callback AJAX function name",
 							"dependencies": "dependence_ajax",
-							"description": "Asynchronous JavaScript and XML",
-							"default": "FA_name(callback)",
+							"description": "name of java script callback function. You couuld add any functions to your scripts like name=function(response);",
+							"default": "add_event_callback",
 				        },
 				        "render_by_id": {
 				        	"disabled" : disabled,
 							"type": "string",
 							"title": "render_by_id",
 							"dependencies": "dependence_ajax",
-							//"description": "Asynchronous JavaScript and XML",
+							"description": "Insert html node id to render form dynamicly. Example '#form_div'. You coud use js function driectly on your files: get_ajax_form( {'ID;:'','ajax_target':'','args':''} );  ID: its your page id with linked ACF form, ajax_target: its html node to render it, args: its your display form properties.",
 							//"default": "FA_name(callback)",
 				        },
 
-
+ 						"dependence_two": {
+				        	"disabled" : disabled,
+		                    //"title": "More form options?",
+		                    "type": "boolean"
+		                },
 				       
 				        "label_placement": {
 				        	"disabled" : disabled,
 							"type": "string",
 							"title": "Label placement",
-							"dependencies": "dependence_one",
+							"dependencies": "dependence_two",
 							"enum": ['top', 'left' ,'none']
 				        },				       
-				        "dependence_two": {
-				        	"disabled" : disabled,
-		                    //"title": "More form options?",
-		                    "type": "boolean"
-		                },
+				       
 		                "in_content_pos": {
 				        	"disabled" : disabled,
 							"type": "string",
@@ -336,7 +365,7 @@ function afd_frontend_meta_box_callback( $post ) {
 				        },
 				        "display_edit": {
 				        	"disabled" : disabled,
-							"description": "Edited mode activated by get &edit=form &guid=user_id",
+							"description": "Display form olny to author. More examples activated form to edit objects.\nEdited mode activated by get:\n &edit=form&guid=user_id",
 							"type": "boolean"
 				        },
 				        "dependence_three": {
@@ -728,14 +757,34 @@ function afd_add_form_to_frontend_page($content) {
 
 		if($args['render_by_id'] == true){
 			unset($args['dependence_one']);
+			unset($args['dependence_two']);
+			unset($args['dependence_three']);
+			unset($args['dependence_ajax']);
 			afd_form_head();
+			wp_deregister_style( 'wp-admin' );	
 			?>
-			<script>
-				jQuery.post("<?php echo plugins_url('inc/afd_acf_extend_api.php', __FILE__) ?>" , {'ID':108,'ajax_target':'#<?php echo $args["render_by_id"];?>','args':<?php echo urldecode ( get_post_meta($post->ID,'_meta_afd_form_render_box_alpaca', true )); ?>}, function(response) {
-								jQuery('#<?php echo $args["render_by_id"];?>').append(response);
-								//renderedForm.setValue(JSON.parse(decodeURIComponent(response)));
-							});
+
+			<!-- GOOGLE MAP AJAX HACK -->
+			<!--<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true&libraries=places"></script>-->
 			
+			
+
+
+			<script>
+			jQuery(document).ready(function( $ ) {		
+				var args = [{
+					'ajax':true,
+					'post_id':'<?php echo $post->ID; ?>',
+					'render_by_id':'<?php echo $args["render_by_id"];?>',
+					'args':<?php echo urldecode ( get_post_meta($post->ID,'_meta_afd_form_render_box_alpaca', true )); ?>,
+					'google_map':true,
+				}];
+				if(window.adf_forms_queue == 0){
+					AFD_render_form(args);	
+				}
+			
+				
+			});			
 			</script>
 			<?php
 		}
@@ -785,3 +834,6 @@ function acf_js_init()
 	}
 }
 add_action('wp_head','acf_js_init');
+
+
+

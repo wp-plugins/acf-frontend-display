@@ -67,8 +67,7 @@ class acf_uigen_mass_uploader extends acf_field
 
 		//echo $upload_dir;
 
-
-		wp_register_script( 'jquery-ui-widget', $plugin_url_uploader.'js/vendor/jquery.ui.widget.js');
+		/*wp_register_script( 'jquery-ui-widget', $plugin_url_uploader.'js/vendor/jquery.ui.widget.js');
 		wp_enqueue_script( 'jquery-ui-widget' );
 
 		wp_register_script( 'load-image-all', $plugin_url_uploader.'js/load-image.all.min.js');
@@ -77,7 +76,7 @@ class acf_uigen_mass_uploader extends acf_field
 		wp_register_script( 'Canvas-to-Blob', $plugin_url_uploader.'js/canvas-to-blob.min.js');
 		wp_enqueue_script( 'Canvas-to-Blob' );
 
-		/* uploader 302 status fix (try dont use it) */
+		// uploader 302 status fix (try dont use it) 
 		//$plugin_url_uploader = 'https://blueimp.github.io/jQuery-File-Upload';
 
 		wp_register_script( 'jquery-iframe-transport',  $plugin_url_uploader.'js/jquery.iframe-transport.js');
@@ -93,10 +92,19 @@ class acf_uigen_mass_uploader extends acf_field
 		wp_enqueue_script( 'jquery-file-upload-image' );
 
 		wp_register_script( 'jquery-file-upload-validate',  $plugin_url_uploader.'js/jquery.fileupload-validate.js');
-
-	?>
-
+*/
+		// ajax rebuilder
 	
+		
+	?>
+		<script src="<?php echo $plugin_url_uploader.'js/vendor/jquery.ui.widget.js';?>"></script>
+		<script src="<?php echo $plugin_url_uploader.'js/load-image.all.min.js';?>"></script>
+		<script src="<?php echo $plugin_url_uploader.'js/canvas-to-blob.min.js';?>"></script>
+		<script src="<?php echo $plugin_url_uploader.'js/jquery.iframe-transport.js';?>"></script>
+		<script src="<?php echo $plugin_url_uploader.'js/jquery.fileupload.js';?>"></script>
+		<script src="<?php echo $plugin_url_uploader.'js/jquery.fileupload-process.js';?>"></script>
+		<script src="<?php echo $plugin_url_uploader.'js/jquery.fileupload-image.js';?>"></script>
+		<script src="<?php echo $plugin_url_uploader.'js/jquery.fileupload-validate.js';?>"></script>
 	<div>
 
 	
