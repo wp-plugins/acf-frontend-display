@@ -49,6 +49,8 @@ jQuery(document).ready(function( $ ){
 	});
 
 
+
+
 	AFD_render_form = function(args){
 	
 
@@ -78,7 +80,7 @@ jQuery(document).ready(function( $ ){
 				args = preprocess_ajax_form(args,args['args']);
 				delete args.args;
 
-				$(args.render_by_id).append('<div class="afd_loader" style="background-color:#666; padding:5px"> LOADING DATA...</div>');
+				$(args.render_by_id).append('<div class="afd_loader" style="padding:5px"> ŁADOWANIE DANYCH...</div>');
 
 				jQuery.post(window.pluginURI+'inc/afd_acf_extend_api.php' , args, function(response) {
 					
@@ -122,8 +124,27 @@ jQuery(document).ready(function( $ ){
 	}
 
 	validate_ajax_form = function(form_id){
+
 		
+if($('#acf-field-liczba_uczestnikow-ograniczona').prop("checked") == false){
+	$('#acf-field-liczba_uczestnikow-dowolna').prop("checked", true);
+	$('#acf-field-liczba_ograniczona_do').val('');
+	
+}else{
+	if( $('#acf-field-liczba_ograniczona_do').val() == ''){
+		$('#acf-field-liczba_ograniczona_do').val('21');
+	}
+}
+
+if($('#acf-field-dostepnosc-tylko_na_zaproszenie').prop("checked") == false){
+	$('#acf-field-dostepnosc-kazdy_moze_dolaczyc').prop("checked", true);
+}
+
+
+
 		var VALIDATE_guardian = true;
+
+
 		
 		$('#'+form_id+' input').each(function( index ) {
 			
@@ -150,8 +171,22 @@ jQuery(document).ready(function( $ ){
 
 			}
 		});
+
+		if($('#'+form_id+' select option:selected' ).val()==''){
+			VALIDATE_guardian = false;
+			$('#'+form_id+' select').css('border','2px solid red');
+				
+		}else{
+
+			$('#'+form_id+' select').css('border','0');
+		}
+
+		
+		
 		return VALIDATE_guardian;
 	}
+
+
 
 
 

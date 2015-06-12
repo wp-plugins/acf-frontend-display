@@ -2,6 +2,13 @@
 	require_once("../../../../wp-load.php");
 	global $post;
 
+	$current_user = get_current_user_id();
+
+	if($current_user == 0){
+		echo '{"warning":"access terminated - you must login"}';
+		die();
+	}
+
 	$rel_meta_name = 'rel_'.$_POST['meta_name'];
 	$result = get_post_meta($_POST['post_id'], $rel_meta_name, false);
 
@@ -50,6 +57,8 @@
 	}
 
 	send_emails($_POST['post_id'], $val_emails);
+
+	var_dump($val_emails);
 
 	function send_emails($eventid,$emails){
 		
