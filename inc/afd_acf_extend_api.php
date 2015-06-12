@@ -456,14 +456,31 @@ function afd_frontend_form( $options = array() )
             $current_user_id = get_current_user_id();
             $user_info = get_userdata($get_guid);
             if($current_user_id == $get_guid){
+
+                echo '<pre>';
+
                 foreach ($fields as $key => $value) {
+                    $user_meta_guardian = true;
                     if($value['name'] == 'first_name'){
                         $fields[$key]['value'] = $user_info->first_name;
+                        $user_meta_guardian = false;
                     }
                     if($value['name'] == 'last_name'){
                         $fields[$key]['value'] = $user_info->last_name;
+                        $user_meta_guardian = false;
                     }
+                    if($user_meta_guardian == true){
+                        
+                        $my_value = get_user_meta($get_guid,$fields[$key]['name'],true);
+                        $fields[$key]['value'] = $my_value;
+                        //$fields[$key]['value'] = '1';
+                    }
+                    
                 }
+
+
+
+                echo '</pre>';
             }else{
                 echo 'User acces lock. Login as right user !!!'; 
                 $block_display_guargian = true;
@@ -496,7 +513,9 @@ function afd_frontend_form( $options = array() )
         if($block_display_guargian != true){
             
             echo  $html_body_top_decorator;
+            
             afd_create_fields($fields, $options['post_id']);
+            
             echo $html_body_bottom_decorator;
         }
        
@@ -615,8 +634,15 @@ function afd_create_fields( $fields, $post_id )
                            $field['class'] = $exist_classes.' form-control'; 
                         }
                     }
-                  
+                    
+                    /* --------------------------------------------------------- */
+                    /* --------------------------------------------------------- */
+                    echo 
                     do_action('acf/create_field', $field, $post_id);
+                    
+                    /* --------------------------------------------------------- */
+                    /* --------------------------------------------------------- */
+
                     echo '</div>';
 
                     echo '<br style="clear:both">';

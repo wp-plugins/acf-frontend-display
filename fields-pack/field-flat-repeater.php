@@ -96,7 +96,7 @@ class acf_afd_multi_relation extends acf_field
 		$o = array( 'class', 'data-mask', 'data-type', 'name', 'value' , 'placeholder');
 		foreach( $o as $k )
 		{
-			$e .= ' ' . $k . '="' . esc_attr( $field[ $k ] ) . '"';	
+			@$e .= ' ' . $k . '="' . esc_attr( @$field[ $k ] ) . '"';	
 		}
 
 		$repeter_tech_meta_key = 'ref_'.$field['_name'];
@@ -375,7 +375,7 @@ class acf_afd_multi_relation extends acf_field
 	{
 		// Note: This function can be removed if not used
 
-		add_post_meta($post_id, 'dodani_do_spotkania' , 'sraj', true);
+		//add_post_meta($post_id, 'dodani_do_spotkania' , 'sraj', true);
 
 		return $field;
 	}

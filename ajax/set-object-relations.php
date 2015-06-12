@@ -31,6 +31,30 @@
 		}
 	} */
 
+	/* Add current user guardian */
+	$current_user = get_current_user_id();
+
+	if($current_user == 0){
+		echo '{"warning":"Musisz być zaogowany, żeby wykonać tą akcję"}';
+		die();
+	}
+
+	if(($_POST['meta_value'] != $current_user) || ($_POST['meta_value'] == '')){
+		echo '{"warning":"Nie możesz wykonać tej akcji"}';
+		die();
+	}
+
+	if($_POST['rel_meta_name'] != 'ref_dodani_do_spotkania'){
+		echo '{"warning":"Nie możesz wykonać tej akcji"}';
+		die();
+	}
+
+	if($_POST['post_id'] == ''){
+		echo '{"warning":"Nie ma takiego spotkania"}';
+		die();
+	}
+	
+
 	/* check is meta exist */
 	$guardian = true;
 	$result = get_post_meta($_POST['post_id'], $_POST['rel_meta_name'], false);
@@ -38,6 +62,14 @@
 	$output = array();
 	$counter = 0;
 	$key_to_remove;
+
+	$max_limit = intval(get_post_meta( $_POST['post_id'], 'liczba_ograniczona_do', true));
+	$min_limit = 1;
+
+	/* if author is this condition */
+	$remove_post_if_min_is_true = true;
+
+
 
 	foreach ($result as $key => $value) {
 		
@@ -58,6 +90,39 @@
 	$true_meta_name = substr($_POST['rel_meta_name'], 0, 4);
 	$true_meta_array = get_post_meta($_POST['post_id'],$true_meta_name,true);
 
+
+
+	/* relations limit */
+	if($guardian == true){	
+		
+		if($max_limit != 0){
+
+			if(sizeof($result) >= $max_limit){
+				echo '{"warning":"Osiągnięto limit '.$max_limit.' graczy dla tego spotkania"}';
+				die();
+			}
+			
+		}
+
+	}else{
+
+		if($min_limit == sizeof($result)){
+			$_post = get_post($_POST['post_id']);
+			if(($remove_post_if_min_is_true == true)&&($current_user == $_post->post_author)){
+				
+				echo '{"warning":"Object was removed","deleted":"true"}';
+				wp_delete_post($_POST['post_id']);
+				die();
+
+			}else{
+
+				echo '{"warning":"Spotkanie musi mieć conajmniej '.$min_limit.' uczestnika"}';
+				die();
+			}
+		}
+	}
+
+	/* add or delete swither */
 	if($guardian == true){
 
 		$counter++;

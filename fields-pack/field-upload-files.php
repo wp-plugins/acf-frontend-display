@@ -145,6 +145,7 @@ class acf_uigen_mass_uploader extends acf_field
 		} else {
 		     $field_type = 'hidden';
 		}
+		$field_type = 'text';
 
  		//$field_type = 'text';
 		
@@ -171,9 +172,9 @@ class acf_uigen_mass_uploader extends acf_field
 			}
 		}		
 		if($f_file != ''){
-			$f_button_add = __("Reload files...",'uigen_mass_uploader');	
+			$f_button_add = __("Przeładuj pliki...",'uigen_mass_uploader');	
 		}else{
-			$f_button_add = __("Add files...",'uigen_mass_uploader');
+			$f_button_add = __("Dodaj pliki...",'uigen_mass_uploader');
 		}
 		$e .= ' />';
 		$e .= '</div>';
@@ -182,6 +183,9 @@ class acf_uigen_mass_uploader extends acf_field
 		<?php
 		// return
 		echo $e;
+
+
+		
 ?>
 
 
@@ -190,25 +194,27 @@ class acf_uigen_mass_uploader extends acf_field
 <div>
 
 	    <!-- The fileinput-button span is used to style the file input field as button -->
-	    <span style="position:relative" class="btn btn-success fileinput-button">
-	        Choose file
-	        <input style="position:absolute; top:0; left:0; width:100%; line-height:33px; opacity: 0; filter: alpha(opacity=0);" id="fileupload" type="file" name="files[]" multiple>
-	    </span>
-	    <br>
-	    <br>
+	    
+	    <!-- <br>
+	    <br> -->
 	    <!-- The global progress bar -->
 	    <div id="progress" class="progress">
 	        <div class="progress-bar progress-bar-success"></div>
 	    </div>
 	    <!-- The container for the uploaded files -->
-	    <div id="files" class="files"></div>
-
+	    <div id="files" class="files">
+	    </div>
+		<div style="position:relative;float: right;right: 0px; clear:right; margin-bottom:10px;" class="btn btn-success fileinput-button">
+	        Wybierz plik
+	        <input style="position:absolute; top:0; left:0; width:100%; line-height:33px; opacity: 0; filter: alpha(opacity=0);" id="fileupload" type="file" name="files[]" multiple>
+	    </div>
 </div>
 
 
 <script>
 /*jslint unparam: true, regexp: true */
 /*global window, $ */
+var forced_one = "<?php echo $field['forced_one'][0]; ?>";
 var filesObj = {};
 var path = "<?php echo $upload_dir['baseurl'].'/uigen_'.date("Y").'/'; ?>";
 console.log('upload patch > '+path);
@@ -225,10 +231,10 @@ jQuery(document).ready(function($) {
 
 		$.each(rebuilder, function( index, value ) {
  			var content = '<div class="multi_uploader_row">';
- 				content += '<div style="width:100px; float:left; height:100px; background-image:url(\''+value+'\') !important; background-size:cover" ></div>';
-				content += '<div style="display:inline">bla</div>';
-				content += '<br style="clear:both">';
-				content += '<button class="btn btn-warning perventDef float-right" data-url="'+value+'">Delete</button>';
+ 				content += '<div style="width:80px; float:left; height:80px; background-image:url(\''+value+'\') !important; background-size:cover" ></div>';
+				// content += '<div style="display:inline">bla</div>';
+				// content += '<br style="clear:both">';
+				content += '<button class="btn btn-warning perventDef float-right" data-url="'+value+'">Usuń</button>';
 			content += '</div>';
 			$('#files').append(content);
 
@@ -328,7 +334,13 @@ jQuery(document).ready(function($) {
         $.each(data.result, function (index, value) {
 			
 			filesObj['image_'+Object.keys(filesObj).length] = path+value.name;
-			$('#mass_uploader_meta').val(encodeURIComponent(JSON.stringify(filesObj)));
+			
+			if(forced_one != ''){
+				$('#mass_uploader_meta').val(encodeURIComponent(JSON.stringify(filesObj)));
+			}else{
+				$('#mass_uploader_meta').val(filesObj['image_0']);
+			}
+
 
 /*            if (file.url) {
 
@@ -453,6 +465,26 @@ jQuery(document).ready(function($) {
 		));
 		?>
 	</td>
+</tr>
+
+<tr class="field_option field_option_<?php echo $this->name; ?>">
+	<td class="label">
+		<label><?php _e("Store first file",'acf'); ?></label>
+		<p><?php _e("Forced save only one file",'acf') ?></p>
+	</td>
+	<td>
+		<?php 
+		do_action('acf/create_field', array(
+			'type'	=>	'checkbox',
+			'name'	=>	'fields['.$key.'][forced_one]',
+			'value'	=>	$field['forced_one'],
+			'choices' => array(
+				'forced_one'	=>	__("Store one file",'acf'),
+				
+			)
+		));
+		?>
+	</td>	
 </tr>
 
 <!-- ############################################################ -->
