@@ -5,7 +5,7 @@ Plugin URI: https://github.com/dadmor/ACF_frontend_display
 Description: WordPress plugin to display afd form on frontend your site. This Plugin enhancing the Advanced Custom Fields (ACF)
 Author: gdurtan
 Author URI: grzegorz.durtan.pl
-Version: 2.0.2
+Version: 2.0.3
 License: GPL2
 */
 /* --------------------------------- */
@@ -185,3 +185,11 @@ function my_edit_post_link() {
     $url = get_permalink().'?pid='.$post->ID;
     return $url;
 }
+function get_action_edit(){
+    if($_GET['action']=='edit'){
+        global $post;
+        wp_redirect(get_permalink().'?pid='.$post->ID);
+        exit;
+    }
+}
+add_action('wp', 'get_action_edit');
