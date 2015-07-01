@@ -3,7 +3,7 @@ Contributors: gdurtan
 Tags: ACF, Advanced Custom Field, Frontend, display form
 Requires at least: 3.1
 Tested up to: 4.0
-Stable tag: 2.0.4
+Stable tag: 2.0.5
 License: GPLv2 or later
 
 ACF Frontend display - plugin to display ACF form on frontend your site
@@ -27,6 +27,9 @@ Upload the ACF Frontend display plugin to your blog, Activate it.
 1, 2, 3: You're done!
 
 == Changelog ==
+= 2.0.5 =
+* add ob_start to render form on content (fixes many problems with shordcodes and other content modyfications)
+
 = 2.0.4 =
 * add action=edit redirect to frontend edit
 
@@ -90,6 +93,6 @@ Upload the ACF Frontend display plugin to your blog, Activate it.
 
 == Screenshots ==
 
-1. Activate frontend display form
-2. More ACF form options
+1. Display ACF form on your blog
+
 

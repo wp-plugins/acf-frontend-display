@@ -3,18 +3,25 @@ function init_acfHeader(){
 	
 	global $post;
 
-	if(($post->post_type == 'page')||($_GET['pid']!='')){
+	if(($post->post_type == 'page')||($_GET['pid']!='')||($post->post_type == 'post')){
 	
 		$args_id = afd_form_permision();
 		$display_form_checkbox = get_post_meta($args_id[0],'_meta_afd_form_render_box_key',true);
 
 		define("ACF_FRONTEND_DISPLAY", $display_form_checkbox);
+		
+		$rule = get_post_meta($args_id[0],'rule',true);
+		if($rule['param'] != 'post'){
+			$display_form_checkbox == 'false';
+		}
 
 		if($display_form_checkbox=='true'){
 			acf_form_head();
 		}
 	
 	}
+
+
 
 }
 //add_action('get_header', 'init_acfHeader');
@@ -25,15 +32,22 @@ function render_acfForm($content){
 	if ( ! is_admin() ) {
 		
 		global $post;
+		$render_form = true;
 
 		/* form are display only for pages and posts when edit */
-		if(($post->post_type == 'page')||($_GET['pid']!='')){
+		if(($post->post_type == 'page')||($_GET['pid']!='')||($post->post_type == 'post')){
 			
 			/* Check frontend display checkbox */
 			if( ACF_FRONTEND_DISPLAY=='true' ){
 
 				/* GET OPTIONS */
+				$args_id = afd_form_permision();
 				$args = json_decode( urldecode ( get_post_meta($args_id[0],'_meta_afd_form_render_box_alpaca', true )), true );
+
+				$rule = get_post_meta($args_id[0],'rule',true);
+				if($rule['param'] != 'post'){
+					return $content;
+				}
 
 				if($_GET['acf_message'] != ''){
 					
@@ -74,6 +88,7 @@ function render_acfForm($content){
 					} 
 					$arg = array('post_id' => $pid);
 				}
+
 				// Display for login users
 				if($args['display_login'] == 'true'){
 					if ( !is_user_logged_in() ) {
@@ -87,13 +102,35 @@ function render_acfForm($content){
 					$arg['submit_value'] = $args['submit_value'];
 				}
 
-				acf_form($arg);
+				$render_form = true;
 			}
 
-		}	
-		
+		}
+	
 	}
-	return $content;
+
+	if($render_form == true){
+
+		ob_start();
+		acf_form($arg);
+		$form = ob_get_contents();
+		ob_end_clean();
+
+	}
+
+	if($args['in_content_pos'] == 'before'){
+		return $form.$content;
+	}
+
+	if($args['in_content_pos'] == 'disable content'){
+		return false;
+	}
+
+	if($args['in_content_pos'] != 'before'){
+		return $content.$form;
+	}
+
+	
 
 }
 add_filter( 'the_content', 'render_acfForm', 6);

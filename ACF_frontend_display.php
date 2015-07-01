@@ -5,7 +5,7 @@ Plugin URI: https://github.com/dadmor/ACF_frontend_display
 Description: WordPress plugin to display afd form on frontend your site. This Plugin enhancing the Advanced Custom Fields (ACF)
 Author: gdurtan
 Author URI: grzegorz.durtan.pl
-Version: 2.0.4
+Version: 2.0.5
 License: GPL2
 */
 /* --------------------------------- */
@@ -90,7 +90,9 @@ function afd_upload_field() {
 }
 add_action('acf/register_fields', 'afd_upload_field');
 
-/* API */
+/***********************.*/
+/*  API                 .*/
+/***********************.*/
 function afd_form_permision( $options = array() )
 {
     global $post;
@@ -116,12 +118,8 @@ function afd_form_permision( $options = array() )
     // html before fields
     
     $acfs = apply_filters('acf/get_field_groups', array());
-    
-
-
+  
     if( is_array($acfs) ){ foreach( $acfs as $acf ){
-        
-        //var_dump( $options['field_groups'] );
         
         // only add the chosen field groups
         if( !in_array( $acf['id'], $options['field_groups'] ) )
