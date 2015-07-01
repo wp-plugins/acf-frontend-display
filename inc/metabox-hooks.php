@@ -150,6 +150,12 @@ function afd_frontend_meta_box_callback( $post ) {
 							"dependencies": "dependence_one",
 							"description": "A string containing the text displayed on the submit button"
 				        },
+				        "in_content_pos": {
+							"type": "string",
+							"title": "Position in content",
+							"dependencies": "dependence_one",
+							"enum": ['disable content','before', 'after']
+				        },
 				        /*"submit_class": {
 							"type": "string",
 							"title": "Submit class",

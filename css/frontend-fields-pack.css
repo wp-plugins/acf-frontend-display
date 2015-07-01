@@ -1,3 +1,6 @@
 #poststuff{
 	min-width:100% !important;	
 }
+.post .entry-content ul, .post .entry-content ol, .page .entry-content ul, .page .entry-content ol{
+	margin:0px !important;
+}
