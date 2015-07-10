@@ -5,7 +5,7 @@ Plugin URI: https://github.com/dadmor/ACF_frontend_display
 Description: WordPress plugin to display afd form on frontend your site. This Plugin enhancing the Advanced Custom Fields (ACF)
 Author: gdurtan
 Author URI: grzegorz.durtan.pl
-Version: 2.0.5
+Version: 2.0.6
 License: GPL2
 */
 /* --------------------------------- */
@@ -81,9 +81,11 @@ require_once( plugin_dir_path( __FILE__ ) . '/inc/metabox-save.php');
 /* ACF EXTENTION - INIT UPLAOAD FILE */
 function afd_upload_field() {
 
-	require_once( plugin_dir_path( __FILE__ ) . '/fields-pack/field-upload-file.php');
-	require_once( plugin_dir_path( __FILE__ ) . '/fields-pack/field-upload-files.php');
-	require_once( plugin_dir_path( __FILE__ ) . '/fields-pack/field-poolAB-file.php');
+    /* comment sesurity problem js upload library */
+	//require_once( plugin_dir_path( __FILE__ ) . '/fields-pack/field-upload-file.php');
+	//require_once( plugin_dir_path( __FILE__ ) . '/fields-pack/field-upload-files.php');
+	
+    require_once( plugin_dir_path( __FILE__ ) . '/fields-pack/field-poolAB-file.php');
 	require_once( plugin_dir_path( __FILE__ ) . '/fields-pack/field-hidden-file.php');
 	require_once( plugin_dir_path( __FILE__ ) . '/fields-pack/field-date-picker.php');
 	require_once( plugin_dir_path( __FILE__ ) . '/fields-pack/field-flat-repeater.php');
