@@ -13,24 +13,11 @@ License: GPL2
 
 function afd_admin_lib_init() {
 
-	?>
-	<script>
-		window.pluginURI = '<?php echo get_bloginfo("home"); ?>/wp-content/plugins/acf-frontend-display/';
-	</script>
-	<?php
-	
 	wp_register_script( 'alpaca-js', plugins_url('/js/alpaca-core.min.js', __FILE__) );
 	wp_enqueue_script( 'alpaca-js' );
 
 	wp_register_style( 'alpaca-wpadmin-css', plugins_url('/css/alpaca-wpadmin.css', __FILE__) );
 	wp_enqueue_style( 'alpaca-wpadmin-css' );
-
-	/* toggle-switch extra field */
-	//wp_register_style( 'toggle-switch-css', plugins_url('/css/toggle-switch.css', __FILE__) );
-	//wp_enqueue_style('toggle-switch-css');
-
-	//wp_register_script( 'acf-frontend-display-admin', plugins_url('/js/acf-frontend-display-admin.js', __FILE__) );
-	//wp_enqueue_script('acf-frontend-display-admin');
 
 	if(@$_GET['page']=='acf-export'){
 		wp_register_script( 'acf-more-export', plugins_url('/js/acf-more-export.js', __FILE__) );
@@ -44,24 +31,9 @@ function afd_fields_frontend_lib_init() {
 
 	if ( !is_admin() ) {
 
-		?>
-		<script>
-			window.pluginURI = '<?php echo get_bloginfo("home"); ?>/wp-content/plugins/acf-frontend-display/';
-		</script>
-		<?php
-
 		wp_enqueue_script('jquery');
-		//wp_register_script( 'acf-frontend-display', plugins_url('/js/acf-frontend-display.js', __FILE__) );
-		//wp_enqueue_script('acf-frontend-display');
-
-		//wp_register_style( 'toggle-switch-css', plugins_url('/css/toggle-switch.css', __FILE__) );
-		//wp_enqueue_style('toggle-switch-css');
-
 		wp_register_style( 'fields-pack', plugins_url('/css/frontend-fields-pack.css', __FILE__) );
 		wp_enqueue_style('fields-pack');
-
-		//wp_register_script( 'acf-frontend-ajax', plugins_url('/js/acf-frontend-ajax.js', __FILE__) );
-       // wp_enqueue_script( 'acf-frontend-ajax' );
 
 	}
 }
@@ -81,10 +53,6 @@ require_once( plugin_dir_path( __FILE__ ) . '/inc/metabox-save.php');
 /* ACF EXTENTION - INIT UPLAOAD FILE */
 function afd_upload_field() {
 
-    /* comment sesurity problem js upload library */
-	//require_once( plugin_dir_path( __FILE__ ) . '/fields-pack/field-upload-file.php');
-	//require_once( plugin_dir_path( __FILE__ ) . '/fields-pack/field-upload-files.php');
-	
     require_once( plugin_dir_path( __FILE__ ) . '/fields-pack/field-poolAB-file.php');
 	require_once( plugin_dir_path( __FILE__ ) . '/fields-pack/field-hidden-file.php');
 	require_once( plugin_dir_path( __FILE__ ) . '/fields-pack/field-date-picker.php');
@@ -186,7 +154,7 @@ function my_edit_post_link() {
     return $url;
 }
 function get_action_edit(){
-    if($_GET['action']=='edit'){
+    if(@$_GET['action']=='edit'){
         global $post;
         wp_redirect(get_permalink().'?pid='.$post->ID);
         exit;
