@@ -101,7 +101,8 @@ function afd_form_permision( $options = array() )
     // html after fields
 }
 
-function flaten_relation_actio_init(){
+function afd_flaten_relation_action_init(){
+    
     function flaten_relation_action($post_id){
        
         $args = json_decode(urldecode($_POST['multi_relation_options']));
@@ -112,11 +113,12 @@ function flaten_relation_actio_init(){
         flaten_relation_builder($value, $post_id , $_POST['multi_relation_field'], $args );
 
     }
+
     if($_POST['add_multi_relation']!=''){
         flaten_relation_action($_POST['add_multi_relation']);
     }
 }
-add_action('init', 'flaten_relation_actio_init');
+add_action('init', 'afd_flaten_relation_action_init');
 
 function flaten_relation_builder($value, $post_id, $field_name, $args = array()){
         
@@ -146,18 +148,18 @@ function flaten_relation_builder($value, $post_id, $field_name, $args = array())
 }
 /* EDIT POST LINK */
 if ( ! is_admin() ) {
-    add_filter( 'get_edit_post_link', 'my_edit_post_link' );
+    add_filter( 'get_edit_post_link', 'afd_edit_post_link' );
 } 
-function my_edit_post_link() {
+function afd_edit_post_link() {
 	global $post;
     $url = get_permalink().'?pid='.$post->ID;
     return $url;
 }
-function get_action_edit(){
+function afd_get_action_edit(){
     if(@$_GET['action']=='edit'){
         global $post;
         wp_redirect(get_permalink().'?pid='.$post->ID);
         exit;
     }
 }
-add_action('wp', 'get_action_edit');
+add_action('wp', 'afd_get_action_edit');
